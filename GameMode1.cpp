@@ -45,12 +45,14 @@ SDL_Texture* rightUser_texture;
 SDL_Rect rightUser_rect;
 SDL_Rect rightUser_dest_rect;
 
-
+int hold[100]; // 1:down 2:left 3: right 4: up
+int f_state; // 1:down 2:left 3: right 4: up
 bool isLeftUser = true;
+string nextHoldPath = "";
 
 Mode1::Mode1() {
 	g_flag_running = true;
-
+	cur_i = 1;
 	// 배경 이미지 로드
 	bg_surface = IMG_Load("../src/bg_mode1.png");
 	bg_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface); // GPU로 옮기기 
@@ -85,6 +87,8 @@ Mode1::Mode1() {
 		hold_textures.push_back(hold_texture);
 		SDL_Rect hold_rect = { 0, 0, hold_surface->w, hold_surface->h };
 		hold_rects.push_back(hold_rect);
+	
+		
 		if (i % 2 == 0) {
 			SDL_Rect hold_dest_rect = { 270, leftHoldY , hold_surface->w, hold_surface->h };
 			hold_dest_rects.push_back(hold_dest_rect);
@@ -95,6 +99,24 @@ Mode1::Mode1() {
 			hold_dest_rects.push_back(hold_dest_rect);
 			rightHoldY -= 150;
 		}
+
+		if (hold_path == "../src/downHold.png") {
+			nextHoldPath = hold_path;
+			hold[i] = 1;
+		}
+		else if (hold_path == "../src/leftHold.png") {
+			nextHoldPath = hold_path;
+			hold[i] = 2;
+		}
+		else if (hold_path == "../src/rightHold.png") {
+			nextHoldPath = hold_path;
+			hold[i] = 3;
+		}
+		else if (hold_path == "../src/upHold.png") {
+			nextHoldPath = hold_path;
+			hold[i] = 4;
+		}
+		// printf("%d\n", hold);
 	}
 
 	// leftUser
@@ -129,7 +151,14 @@ Mode1::~Mode1() {
 
 void Mode1::Update()
 {
-	
+	if (checkHold() == true) {
+		userMove();
+		holdMove();
+		cur_i++;
+	}
+	else {
+
+	}
 }
 
 void Mode1::Render() {
@@ -146,9 +175,11 @@ void Mode1::Render() {
 		SDL_RenderCopy(g_renderer, hold_textures[i], &hold_rects[i], &hold_dest_rects[i]);
 	}
 
+
 	SDL_RenderPresent(g_renderer);
 }
 
+// bg, wall 아래로 내려가고 user는 좌우 움직이기
 void Mode1::userMove() {
 	wall_dest_rect.y += 30;
 	bg_dest_rect.y += 5;
@@ -178,39 +209,59 @@ void Mode1::holdMove() {
 }
 
 
+bool Mode1::checkHold() {
+	if (hold[cur_i] == 1 && f_state == 1) {
+		return true;
+	}
+	else if (hold[cur_i] == 2 && f_state == 2) {
+		return true;
+	}
+	else if (hold[cur_i] == 3 && f_state == 3) {
+		return true;
+	}
+	else if (hold[cur_i] == 4 && f_state == 4) {
+		return true;
+	}
+	else {
+		return false;
+	}
+	
+}
+
 void Mode1::HandleEvents() {
 	
 	SDL_Event event;
 	if (SDL_PollEvent(&event)) {
-		switch (event.type) {
+		switch (event.type) {                
 		case SDL_QUIT:
 			g_flag_running = false;
 			break;
 
-		case SDL_KEYDOWN:
+		case SDL_KEYDOWN: // 1:down 2:left 3: right 4: up
 			if (event.key.keysym.sym == SDLK_LEFT) {
 				// 다음 돌이 leftHold일 때 hold, wall, bg 내려가기 
 				// 아닌경우 stun효과?
-				userMove();
-				holdMove();
+				f_state = 2;
+				
+				
 			}
 			else if (event.key.keysym.sym == SDLK_RIGHT) {
 				// 다음 돌이 rightHold일 때 hold, wall, bg 내려가기
 				// 아닌경우 stun효과?
-				userMove();
-				holdMove();
+				f_state = 3;
+				
 			}
 			else if (event.key.keysym.sym == SDLK_UP) {
 				// 다음 돌이 upHold일 때 hold, wall, bg 내려가기
 				// 아닌경우 stun효과?
-				userMove();
-				holdMove();
+				f_state = 4;
+				
 			}
 			else if (event.key.keysym.sym == SDLK_DOWN) {
 				// 다음 돌이 downHold일 때 hold, wall, bg 내려가기
 				// 아닌경우 stun효과?
-				userMove();
-				holdMove();
+				f_state = 1;
+				
 			}
 			break;
 		
