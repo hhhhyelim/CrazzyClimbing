@@ -13,7 +13,8 @@ public:
 	virtual void Render();
 	void userMove();
 	void holdMove();
+	bool checkHold();
 
 private:
-
+	int cur_i;
 };
