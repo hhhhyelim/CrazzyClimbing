@@ -49,10 +49,12 @@ int hold[100]; // 1:down 2:left 3: right 4: up
 int f_state; // 1:down 2:left 3: right 4: up
 bool isLeftUser = true;
 string nextHoldPath = "";
+int prevHoldIndex = -1;
 
 Mode1::Mode1() {
 	g_flag_running = true;
 	cur_i = 1;
+	prevHold = 0;
 	// 배경 이미지 로드
 	bg_surface = IMG_Load("../src/bg_mode1.png");
 	bg_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface); // GPU로 옮기기 
@@ -78,7 +80,12 @@ Mode1::Mode1() {
 	// hold 이미지 로드
 	srand((unsigned)time(NULL)); // srand는 한 번만 호출해야 합니다.
 	for (int i = 0; i < 40; i++) {
-		int random_hold_idx = rand() % 4; // 0~3 중 하나의 인덱스를 무작위로 선택
+		// int random_hold_idx = rand() % 4; // 0~3 중 하나의 인덱스를 무작위로 선택
+		int random_hold_idx;
+		do {
+			random_hold_idx = rand() % 4; // 0~3 중 하나의 인덱스를 무작위로 선택
+		} while (random_hold_idx == prevHoldIndex); // 현재 인덱스가 이전 인덱스와 같으면 새로운 인덱스를 계속 생성합니다
+		prevHoldIndex = random_hold_idx;
 		string hold_path = hold_paths[random_hold_idx];
 		SDL_Surface* hold_surface = IMG_Load(hold_path.c_str());
 		SDL_Texture* hold_texture = SDL_CreateTextureFromSurface(g_renderer, hold_surface);
@@ -156,9 +163,12 @@ void Mode1::Update()
 		holdMove();
 		cur_i++;
 	}
+	
+	/*
 	else {
 
 	}
+	*/
 }
 
 void Mode1::Render() {
@@ -210,22 +220,53 @@ void Mode1::holdMove() {
 
 
 bool Mode1::checkHold() {
+	/*
 	if (hold[cur_i] == 1 && f_state == 1) {
-		return true;
+		if (prevHold != 1) {
+			prevHold = 1;
+			return true;
+		}
+
 	}
 	else if (hold[cur_i] == 2 && f_state == 2) {
-		return true;
+		if (prevHold != 2) {
+			prevHold = 2;
+			return true;
+		}
 	}
 	else if (hold[cur_i] == 3 && f_state == 3) {
-		return true;
+		if (prevHold != 3) {
+			prevHold = 3;
+			return true;
+		}
 	}
 	else if (hold[cur_i] == 4 && f_state == 4) {
+		if (prevHold != 4) {
+			prevHold = 4;
+			return true;
+		}
+	}
+	*/
+
+	if (hold[cur_i] == f_state) {
+
+		prevHold = f_state;
 		return true;
 	}
 	else {
-		return false;
+		prevHold = 0; // hold가 일치하지 않으면 prevHold 값을 초기화합니다.
 	}
+	return false;
 	
+
+	/*
+	for (int i = 0; i <= cur_i; i++) {
+		if (hold[i] != hold[f_state - 1]){
+			return false;
+		}
+	}
+	return true;
+	*/
 }
 
 void Mode1::HandleEvents() {
@@ -243,25 +284,28 @@ void Mode1::HandleEvents() {
 				// 아닌경우 stun효과?
 				f_state = 2;
 				
-				
 			}
 			else if (event.key.keysym.sym == SDLK_RIGHT) {
 				// 다음 돌이 rightHold일 때 hold, wall, bg 내려가기
 				// 아닌경우 stun효과?
 				f_state = 3;
-				
 			}
 			else if (event.key.keysym.sym == SDLK_UP) {
 				// 다음 돌이 upHold일 때 hold, wall, bg 내려가기
 				// 아닌경우 stun효과?
 				f_state = 4;
-				
 			}
 			else if (event.key.keysym.sym == SDLK_DOWN) {
 				// 다음 돌이 downHold일 때 hold, wall, bg 내려가기
 				// 아닌경우 stun효과?
 				f_state = 1;
-				
+			}
+			break;
+
+		case SDL_KEYUP:
+			if (event.key.keysym.sym == SDLK_DOWN) {
+				// 아래 키를 떼면 f_state 값을 초기화합니다.
+				f_state = 0;
 			}
 			break;
 		
