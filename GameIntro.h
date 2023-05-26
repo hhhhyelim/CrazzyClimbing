@@ -17,4 +17,9 @@ private:
 	SDL_Rect g_bg_destination_rect;
 	SDL_Texture* g_bg_texture;
 
+	// Start Button
+	SDL_Texture* texture_;
+	SDL_Rect source_rectangle_;
+	SDL_Rect destination_rectangle_;
+
 };
