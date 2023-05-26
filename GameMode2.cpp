@@ -27,6 +27,12 @@ vector<SDL_Rect> hold_dest_rects;
 int leftHoldY = 475;
 int rightHoldY = 400;
 
+int hold[100]; // 1:red 2:green 3:blue
+int f_state; // 1:red 2: green 3:blue
+bool isLeftUser = true;
+string nextHoldPath = "";
+int prevHoldIndex = -1;
+
 // leftUser
 SDL_Surface* leftUser_surface;
 SDL_Texture* leftUser_texture;
@@ -39,14 +45,19 @@ SDL_Texture* rightUser_texture;
 SDL_Rect rightUser_rect;
 SDL_Rect rightUser_dest_rect;
 
-
 Mode2::Mode2() {
 	g_flag_running = true;
+	cur_i = 1;
+	prevHold = 0;
 
 	// 배경 이미지 로드
 	bg_surface = IMG_Load("../src/bg_mode2.png");
-	bg_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface); // GPU로 옮기기 
+	SDL_Surface* resized_surface = SDL_CreateRGBSurface(0, 800, 600, 32, 0, 0, 0, 0);
+	SDL_Rect src_rect = { 0, 3000 - 600, 800, 600 };
+	SDL_BlitSurface(bg_surface, &src_rect, resized_surface, NULL);
+	bg_texture = SDL_CreateTextureFromSurface(g_renderer, resized_surface);
 	SDL_FreeSurface(bg_surface);
+	SDL_FreeSurface(resized_surface);
 	bg_rect = { 0, 0, 800, 600 };
 	bg_dest_rect = { 0, 0, 800, 600 };
 
@@ -59,7 +70,12 @@ Mode2::Mode2() {
 
 	srand((unsigned)time(NULL)); // srand는 한 번만 호출해야 합니다.
 	for (int i = 0; i < 40; i++) {
-		int random_hold_idx = rand() % 3; // 0~2 중 하나의 인덱스를 무작위로 선택
+		//int random_hold_idx = rand() % 3; // 0~2 중 하나의 인덱스를 무작위로 선택
+		int random_hold_idx;
+		do {
+			random_hold_idx = rand() % 3; // 0~3 중 하나의 인덱스를 무작위로 선택
+		} while (random_hold_idx == prevHoldIndex); // 현재 인덱스가 이전 인덱스와 같으면 새로운 인덱스를 계속 생성합니다
+		prevHoldIndex = random_hold_idx;
 		string hold_path = hold_paths[random_hold_idx];
 		SDL_Surface* hold_surface = IMG_Load(hold_path.c_str());
 		SDL_Texture* hold_texture = SDL_CreateTextureFromSurface(g_renderer, hold_surface);
@@ -68,6 +84,7 @@ Mode2::Mode2() {
 		hold_textures.push_back(hold_texture);
 		SDL_Rect hold_rect = { 0, 0, hold_surface->w, hold_surface->h };
 		hold_rects.push_back(hold_rect);
+
 		if (i % 2 == 0) {
 			SDL_Rect hold_dest_rect = { 270, leftHoldY , hold_surface->w, hold_surface->h };
 			hold_dest_rects.push_back(hold_dest_rect);
@@ -78,6 +95,19 @@ Mode2::Mode2() {
 			hold_dest_rects.push_back(hold_dest_rect);
 			rightHoldY -= 150;
 		}
+
+		if (hold_path == "../src/redHold.png") {
+			nextHoldPath = hold_path;
+			hold[i] = 1;
+		}
+		else if (hold_path == "../src/greenHold.png") {
+			nextHoldPath = hold_path;
+			hold[i] = 2;
+		}
+		else if (hold_path == "../src/blueHold.png") {
+			nextHoldPath = hold_path;
+			hold[i] = 3;
+		}
 	}
 
 	// leftUser
@@ -85,14 +115,14 @@ Mode2::Mode2() {
 	leftUser_texture = SDL_CreateTextureFromSurface(g_renderer, leftUser_surface);
 	SDL_FreeSurface(leftUser_surface);
 	leftUser_rect = { 0, 0, leftUser_surface->w, leftUser_surface->h };
-	leftUser_dest_rect = { 240, 427, leftUser_surface->w, leftUser_surface->h };
+	leftUser_dest_rect = { 240, 457, leftUser_surface->w, leftUser_surface->h };
 
 	// rightUser
 	rightUser_surface = IMG_Load("../src/rightUser.png");
 	rightUser_texture = SDL_CreateTextureFromSurface(g_renderer, rightUser_surface);
 	SDL_FreeSurface(rightUser_surface);
 	rightUser_rect = { 0, 0, rightUser_surface->w, rightUser_surface->h };
-	rightUser_dest_rect = { 240, 427, rightUser_surface->w, rightUser_surface->h };
+	rightUser_dest_rect = { 240, 457, rightUser_surface->w, rightUser_surface->h };
 }
 
 Mode2::~Mode2() {
@@ -102,41 +132,85 @@ Mode2::~Mode2() {
 	for (SDL_Texture* texture : hold_textures) {
 		SDL_DestroyTexture(texture);
 	}
-	for (SDL_Texture* texture : hold_textures) {
-		SDL_DestroyTexture(texture);
-	}
 	SDL_DestroyTexture(leftUser_texture);
 	SDL_DestroyTexture(rightUser_texture);
 }
 
 void Mode2::Update()
 {
+	if (checkHold()) {
+		userMove();
+		holdMove();
+		cur_i++;
+	}
+	if (checkHold() == true) {
+		false;
+		// Background Update
+		bg_dest_rect.y += 10;
+		if (bg_dest_rect.y >= 600) {
+			bg_dest_rect.y = 0;
+		}
 
+		//wall
+		if (wall_dest_rect.y >= 600) {
+			wall_dest_rect.y = 0;
+		}
+	}
 }
 
-void Mode2 ::Render() {
+void Mode2::Render() {
 	SDL_RenderClear(g_renderer);
-	SDL_RenderCopy(g_renderer, bg_texture, &bg_rect, &bg_dest_rect);
-	SDL_RenderCopy(g_renderer, wall_texture, &wall_rect, &wall_dest_rect);
 
-	for (size_t i = 0; i < hold_textures.size(); i++) {
-		SDL_RenderCopy(g_renderer, hold_textures[i], &hold_rects[i], &hold_dest_rects[i]);
+	//배경이어지기
+	{
+		SDL_Rect tmp_r;
+		tmp_r.x = 0;
+		tmp_r.y = bg_dest_rect.y - 600;
+		tmp_r.w = bg_dest_rect.w;
+		tmp_r.h = bg_dest_rect.h;
+		SDL_RenderCopy(g_renderer, bg_texture, NULL, &tmp_r);
+
+		tmp_r.x = 0;
+		tmp_r.y = bg_dest_rect.y;
+		tmp_r.w = bg_dest_rect.w;
+		tmp_r.h = bg_dest_rect.h;
+		SDL_RenderCopy(g_renderer, bg_texture, NULL, &tmp_r);
+	}
+
+	//벽이어지기
+	{
+		SDL_Rect tmp_r;
+		tmp_r.x = wall_dest_rect.x;
+		tmp_r.y = wall_dest_rect.y - 600;
+		tmp_r.w = wall_dest_rect.w;
+		tmp_r.h = wall_dest_rect.h;
+		SDL_RenderCopy(g_renderer, wall_texture, &wall_rect, &tmp_r);
+		tmp_r.x = wall_dest_rect.x;
+		tmp_r.y = wall_dest_rect.y;
+		tmp_r.w = wall_dest_rect.w;
+		tmp_r.h = wall_dest_rect.h;
+		SDL_RenderCopy(g_renderer, wall_texture, &wall_rect, &tmp_r);
 	}
 
 	for (size_t i = 0; i < hold_textures.size(); i++) {
 		SDL_RenderCopy(g_renderer, hold_textures[i], &hold_rects[i], &hold_dest_rects[i]);
 	}
-
 	SDL_RenderCopy(g_renderer, leftUser_texture, &leftUser_rect, &leftUser_dest_rect);
 
 	SDL_RenderPresent(g_renderer);
 }
 
-bool isLeftUser = true;
-
-void Mode2 :: userMove() {
+void Mode2::userMove() {
+	//배경 아래로 움직이기
 	wall_dest_rect.y += 30;
 	bg_dest_rect.y += 5;
+
+	// 새로운 배경 텍스처 생성
+	/*SDL_Surface* new_bg_surface = IMG_Load("../src/bg_mode2.png");
+	SDL_Texture* new_bg_texture = SDL_CreateTextureFromSurface(g_renderer, new_bg_surface);
+	SDL_FreeSurface(new_bg_surface);
+	SDL_DestroyTexture(bg_texture);
+	bg_texture = new_bg_texture;*/
 
 	//왼쪽유저일때 오른쪽유저로 바꾸기
 	if (isLeftUser) {
@@ -166,8 +240,21 @@ void Mode2::holdMove() {
 	}
 }
 
+bool Mode2::checkHold() {
+	if (hold[cur_i] == f_state) {
+
+		prevHold = f_state;
+		return true;
+	}
+	else {
+		prevHold = 0; // hold가 일치하지 않으면 prevHold 값을 초기화합니다.
+	}
+	return false;
+}
+
 void Mode2::HandleEvents() {
 	SDL_Event event;
+
 	if (SDL_PollEvent(&event)) {
 		switch (event.type) {
 		case SDL_QUIT:
@@ -176,22 +263,16 @@ void Mode2::HandleEvents() {
 
 		case SDL_KEYDOWN:
 			if (event.key.keysym.sym == SDLK_r) {
-				//if(다음홀드 == SDLK_r){
-				userMove();
-				holdMove();
-				//}
-				//else { 게임오버 }
+				f_state = 1;
 			}
-
 			else if (event.key.keysym.sym == SDLK_g) {
-				userMove();
-				holdMove();
+				f_state = 2;
 			}
-
 			else if (event.key.keysym.sym == SDLK_b) {
-				userMove();
-				holdMove();
+				f_state = 3;
 			}
+			break;
+
 		default:
 			break;
 		}
