@@ -45,6 +45,10 @@ SDL_Texture* rightUser_texture;
 SDL_Rect rightUser_rect;
 SDL_Rect rightUser_dest_rect;
 
+//게이지
+int gauge = 100; // 초기 게이지 값
+int gaugeDecreaseRate = 1; // 게이지 감소 속도
+
 Mode2::Mode2() {
 	g_flag_running = true;
 	cur_i = 1;
@@ -115,14 +119,14 @@ Mode2::Mode2() {
 	leftUser_texture = SDL_CreateTextureFromSurface(g_renderer, leftUser_surface);
 	SDL_FreeSurface(leftUser_surface);
 	leftUser_rect = { 0, 0, leftUser_surface->w, leftUser_surface->h };
-	leftUser_dest_rect = { 240, 457, leftUser_surface->w, leftUser_surface->h };
+	leftUser_dest_rect = { 240, 447, leftUser_surface->w, leftUser_surface->h };
 
 	// rightUser
 	rightUser_surface = IMG_Load("../src/rightUser.png");
 	rightUser_texture = SDL_CreateTextureFromSurface(g_renderer, rightUser_surface);
 	SDL_FreeSurface(rightUser_surface);
 	rightUser_rect = { 0, 0, rightUser_surface->w, rightUser_surface->h };
-	rightUser_dest_rect = { 240, 457, rightUser_surface->w, rightUser_surface->h };
+	rightUser_dest_rect = { 240, 447, rightUser_surface->w, rightUser_surface->h };
 }
 
 Mode2::~Mode2() {
@@ -136,13 +140,31 @@ Mode2::~Mode2() {
 	SDL_DestroyTexture(rightUser_texture);
 }
 
+void Mode2::EndGame() {
+	g_flag_running = false;
+}
+
 void Mode2::Update()
 {
 	if (checkHold()) {
 		userMove();
 		holdMove();
 		cur_i++;
+		gauge += 5;
 	}
+	else {
+		// 게이지 감소
+		gauge -= gaugeDecreaseRate;
+		if (gauge < 0) {
+			gauge = 0;
+		}
+	}
+
+		// 게이지가 0이면 게임 오버
+		if (gauge == 0) {
+			EndGame();
+		}
+
 	if (checkHold() == true) {
 		false;
 		// Background Update
@@ -191,6 +213,11 @@ void Mode2::Render() {
 		tmp_r.h = wall_dest_rect.h;
 		SDL_RenderCopy(g_renderer, wall_texture, &wall_rect, &tmp_r);
 	}
+
+	// 게이지 그리기
+	SDL_Rect gaugeRect = { 20, 20, gauge, 30 }; // 게이지 위치와 크기 설정
+	SDL_SetRenderDrawColor(g_renderer, 255, 0, 0, 255); // 게이지 색상 (빨간색)
+	SDL_RenderFillRect(g_renderer, &gaugeRect);
 
 	for (size_t i = 0; i < hold_textures.size(); i++) {
 		SDL_RenderCopy(g_renderer, hold_textures[i], &hold_rects[i], &hold_dest_rects[i]);
@@ -264,12 +291,24 @@ void Mode2::HandleEvents() {
 		case SDL_KEYDOWN:
 			if (event.key.keysym.sym == SDLK_r) {
 				f_state = 1;
+				gauge += 10;
+				if (gauge > 100) {
+					gauge = 100;
+				}
 			}
 			else if (event.key.keysym.sym == SDLK_g) {
 				f_state = 2;
+				gauge += 10; // 버튼을 누를 때 게이지를 증가시킴
+				if (gauge > 100) {
+					gauge = 100;
+				}
 			}
 			else if (event.key.keysym.sym == SDLK_b) {
 				f_state = 3;
+				gauge += 10; // 버튼을 누를 때 게이지를 증가시킴
+				if (gauge > 100) {
+					gauge = 100;
+				}
 			}
 			break;
 
