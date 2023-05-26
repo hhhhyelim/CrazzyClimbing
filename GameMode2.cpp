@@ -46,7 +46,7 @@ SDL_Rect rightUser_rect;
 SDL_Rect rightUser_dest_rect;
 
 //게이지
-int gauge = 100; // 초기 게이지 값
+int gauge = 150; // 초기 게이지 값
 int gaugeDecreaseRate = 1; // 게이지 감소 속도
 
 Mode2::Mode2() {
@@ -159,7 +159,6 @@ void Mode2::Update()
 			gauge = 0;
 		}
 	}
-
 		// 게이지가 0이면 게임 오버
 		if (gauge == 0) {
 			EndGame();
@@ -219,6 +218,16 @@ void Mode2::Render() {
 	SDL_SetRenderDrawColor(g_renderer, 255, 0, 0, 255); // 게이지 색상 (빨간색)
 	SDL_RenderFillRect(g_renderer, &gaugeRect);
 
+	// 게이지 테두리 그리기
+	SDL_Rect gaugeBorderRect = { 20, 20, 150, 30 }; // 게이지 테두리 위치와 크기 설정
+	SDL_SetRenderDrawColor(g_renderer, 255, 255, 255, 255); // 게이지 테두리 색상 (흰색)
+	int borderWidth = 4; // 테두리 두께 설정
+	for (int i = 0; i < borderWidth; i++) {
+		SDL_Rect borderRect = { gaugeBorderRect.x - i, gaugeBorderRect.y - i, gaugeBorderRect.w + 2 * i, gaugeBorderRect.h + 2 * i };
+		SDL_RenderDrawRect(g_renderer, &borderRect);
+	}
+
+	//홀드그리기
 	for (size_t i = 0; i < hold_textures.size(); i++) {
 		SDL_RenderCopy(g_renderer, hold_textures[i], &hold_rects[i], &hold_dest_rects[i]);
 	}
@@ -231,13 +240,6 @@ void Mode2::userMove() {
 	//배경 아래로 움직이기
 	wall_dest_rect.y += 30;
 	bg_dest_rect.y += 5;
-
-	// 새로운 배경 텍스처 생성
-	/*SDL_Surface* new_bg_surface = IMG_Load("../src/bg_mode2.png");
-	SDL_Texture* new_bg_texture = SDL_CreateTextureFromSurface(g_renderer, new_bg_surface);
-	SDL_FreeSurface(new_bg_surface);
-	SDL_DestroyTexture(bg_texture);
-	bg_texture = new_bg_texture;*/
 
 	//왼쪽유저일때 오른쪽유저로 바꾸기
 	if (isLeftUser) {
