@@ -55,6 +55,11 @@ private:
 	SDL_Rect source_rectangle_;
 	SDL_Rect destination_rectangle_;
 
+	//monkey
+	SDL_Texture* texture_monkey;
+	SDL_Rect source_rectangle_monkey;
+	SDL_Rect destination_rectangle_monkey;
+
 	// Bakc Button
 	SDL_Texture* texture_bb;
 	SDL_Rect source_rectangle_bb;
@@ -70,6 +75,8 @@ private:
 	bool game_start;
 	bool game_over;
 	
+	int currentCharacterIndex;
+	bool correct_button;
 
 
 
