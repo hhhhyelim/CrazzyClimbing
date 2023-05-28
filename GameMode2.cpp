@@ -49,6 +49,12 @@ SDL_Rect rightUser_dest_rect;
 int gauge = 150; // 초기 게이지 값
 int gaugeDecreaseRate = 1; // 게이지 감소 속도
 
+//뒤로가기버튼
+SDL_Surface* back_surface;
+SDL_Texture* back_texture;
+SDL_Rect back_rect;
+SDL_Rect back_dest_rect;
+
 Mode2::Mode2() {
 	g_flag_running = true;
 	cur_i = 1;
@@ -83,10 +89,10 @@ Mode2::Mode2() {
 		string hold_path = hold_paths[random_hold_idx];
 		SDL_Surface* hold_surface = IMG_Load(hold_path.c_str());
 		SDL_Texture* hold_texture = SDL_CreateTextureFromSurface(g_renderer, hold_surface);
-		SDL_FreeSurface(hold_surface);
+		SDL_Rect hold_rect = { 0, 0, hold_surface->w, hold_surface->h };
+
 		hold_surfaces.push_back(hold_surface);
 		hold_textures.push_back(hold_texture);
-		SDL_Rect hold_rect = { 0, 0, hold_surface->w, hold_surface->h };
 		hold_rects.push_back(hold_rect);
 
 		if (i % 2 == 0) {
@@ -127,6 +133,13 @@ Mode2::Mode2() {
 	SDL_FreeSurface(rightUser_surface);
 	rightUser_rect = { 0, 0, rightUser_surface->w, rightUser_surface->h };
 	rightUser_dest_rect = { 240, 447, rightUser_surface->w, rightUser_surface->h };
+
+	//뒤로가기
+	back_surface = IMG_Load("../src/back.png");
+	back_texture = SDL_CreateTextureFromSurface(g_renderer, back_surface);
+	SDL_FreeSurface(back_surface);
+	back_rect = { 0, 0, back_surface->w, back_surface->h };
+	back_dest_rect = { 10, 10, back_surface->w, back_surface->h };
 }
 
 Mode2::~Mode2() {
@@ -138,10 +151,7 @@ Mode2::~Mode2() {
 	}
 	SDL_DestroyTexture(leftUser_texture);
 	SDL_DestroyTexture(rightUser_texture);
-}
-
-void Mode2::EndGame() {
-	g_flag_running = false;
+	SDL_DestroyTexture(back_texture);
 }
 
 void Mode2::Update()
@@ -161,17 +171,16 @@ void Mode2::Update()
 	}
 		// 게이지가 0이면 게임 오버
 		if (gauge == 0) {
-			EndGame();
+			ResetGame();
+			g_current_game_phase = PHASE_ENDING2;
 		}
 
-	if (checkHold() == true) {
-		false;
+	if (checkHold()) {
 		// Background Update
 		bg_dest_rect.y += 10;
 		if (bg_dest_rect.y >= 600) {
 			bg_dest_rect.y = 0;
 		}
-
 		//wall
 		if (wall_dest_rect.y >= 600) {
 			wall_dest_rect.y = 0;
@@ -180,8 +189,6 @@ void Mode2::Update()
 }
 
 void Mode2::Render() {
-	SDL_RenderClear(g_renderer);
-
 	//배경이어지기
 	{
 		SDL_Rect tmp_r;
@@ -197,7 +204,6 @@ void Mode2::Render() {
 		tmp_r.h = bg_dest_rect.h;
 		SDL_RenderCopy(g_renderer, bg_texture, NULL, &tmp_r);
 	}
-
 	//벽이어지기
 	{
 		SDL_Rect tmp_r;
@@ -212,29 +218,39 @@ void Mode2::Render() {
 		tmp_r.h = wall_dest_rect.h;
 		SDL_RenderCopy(g_renderer, wall_texture, &wall_rect, &tmp_r);
 	}
+		// 게이지 그리기
+		SDL_Rect gaugeRect = { 615, 20, gauge, 30 }; // 게이지 위치와 크기 설정
+		SDL_SetRenderDrawColor(g_renderer, 255, 0, 0, 255); // 게이지 색상 (빨간색)
+		SDL_RenderFillRect(g_renderer, &gaugeRect);
 
-	// 게이지 그리기
-	SDL_Rect gaugeRect = { 20, 20, gauge, 30 }; // 게이지 위치와 크기 설정
-	SDL_SetRenderDrawColor(g_renderer, 255, 0, 0, 255); // 게이지 색상 (빨간색)
-	SDL_RenderFillRect(g_renderer, &gaugeRect);
+		// 게이지 테두리 그리기
+		SDL_Rect gaugeBorderRect = { 615, 20, 150, 30 }; // 게이지 테두리 위치와 크기 설정
+		SDL_SetRenderDrawColor(g_renderer, 255, 255, 255, 255); // 게이지 테두리 색상 (흰색)
+		int borderWidth = 4; // 테두리 두께 설정
+		for (int i = 0; i < borderWidth; i++) {
+			SDL_Rect borderRect = { gaugeBorderRect.x - i, gaugeBorderRect.y - i, gaugeBorderRect.w + 2 * i, gaugeBorderRect.h + 2 * i };
+			SDL_RenderDrawRect(g_renderer, &borderRect);
+		}
 
-	// 게이지 테두리 그리기
-	SDL_Rect gaugeBorderRect = { 20, 20, 150, 30 }; // 게이지 테두리 위치와 크기 설정
-	SDL_SetRenderDrawColor(g_renderer, 255, 255, 255, 255); // 게이지 테두리 색상 (흰색)
-	int borderWidth = 4; // 테두리 두께 설정
-	for (int i = 0; i < borderWidth; i++) {
-		SDL_Rect borderRect = { gaugeBorderRect.x - i, gaugeBorderRect.y - i, gaugeBorderRect.w + 2 * i, gaugeBorderRect.h + 2 * i };
-		SDL_RenderDrawRect(g_renderer, &borderRect);
+		/*
+		//뒤로가기버튼그리기
+		SDL_Rect back;
+		back.x = back_dest_rect.x;
+		back.y = back_dest_rect.y;
+		back.w = back_dest_rect.w;
+		back.h = back_dest_rect.h;
+		SDL_RenderCopy(g_renderer, back_texture, &back_rect, &back);
+		*/
+
+		//홀드그리기
+		for (size_t i = 0; i < hold_textures.size(); i++) {
+			SDL_RenderCopy(g_renderer, hold_textures[i], &hold_rects[i], &hold_dest_rects[i]);
+		}
+		SDL_RenderCopy(g_renderer, leftUser_texture, &leftUser_rect, &leftUser_dest_rect);
+
+		SDL_RenderPresent(g_renderer);
+
 	}
-
-	//홀드그리기
-	for (size_t i = 0; i < hold_textures.size(); i++) {
-		SDL_RenderCopy(g_renderer, hold_textures[i], &hold_rects[i], &hold_dest_rects[i]);
-	}
-	SDL_RenderCopy(g_renderer, leftUser_texture, &leftUser_rect, &leftUser_dest_rect);
-
-	SDL_RenderPresent(g_renderer);
-}
 
 void Mode2::userMove() {
 	//배경 아래로 움직이기
@@ -271,7 +287,6 @@ void Mode2::holdMove() {
 
 bool Mode2::checkHold() {
 	if (hold[cur_i] == f_state) {
-
 		prevHold = f_state;
 		return true;
 	}
@@ -289,6 +304,22 @@ void Mode2::HandleEvents() {
 		case SDL_QUIT:
 			g_flag_running = false;
 			break;
+
+			/*
+		case SDL_MOUSEBUTTONDOWN: //뒤로가기버튼누르면
+			//if the mouse left button is pressed
+			if (event.button.button == SDL_BUTTON_LEFT) {
+				int mouse_x = event.button.x;
+				int mouse_y = event.button.y;
+
+				if (mouse_x >= back_dest_rect.x &&
+					mouse_x <= back_dest_rect.x + back_dest_rect.w &&
+					mouse_y >= back_dest_rect.y &&
+					mouse_y <= back_dest_rect.y + back_dest_rect.h)
+					ResetGame();
+					g_current_game_phase = PHASE_INTRO;
+				break;
+			}*/
 
 		case SDL_KEYDOWN:
 			if (event.key.keysym.sym == SDLK_r) {
@@ -312,10 +343,45 @@ void Mode2::HandleEvents() {
 					gauge = 100;
 				}
 			}
+			//틀렸을때 게임오버
+			if (f_state != hold[cur_i]) {
+				SDL_Delay(2000); //맞는 효과음 넣으면 ㄱㅊ을듯!!!
+				ResetGame();
+				g_current_game_phase = PHASE_ENDING2; // 페이즈를 엔딩2로 전환
+			}
 			break;
 
 		default:
 			break;
+			}
+		}
+	}
+
+void Mode2::ResetGame() {
+	f_state = 0;
+	gauge = 150;
+	cur_i = 1;
+	prevHold = 0;
+
+	wall_dest_rect.y = 0;
+	bg_dest_rect.y = 0;
+
+	isLeftUser = true;
+	leftUser_dest_rect = { 240, 447, leftUser_surface->w, leftUser_surface->h };
+	rightUser_dest_rect = { 560, 447, rightUser_surface->w, rightUser_surface->h };
+	isLeftUser = true;
+
+	// Reset hold positions
+	leftHoldY = 475;
+	rightHoldY = 400;
+	for (size_t i = 0; i < hold_dest_rects.size(); i++) {
+		if (i % 2 == 0) {
+			hold_dest_rects[i].y = leftHoldY;
+			leftHoldY -= 150;
+		}
+		else {
+			hold_dest_rects[i].y = rightHoldY;
+			rightHoldY -= 150;
 		}
 	}
 }
