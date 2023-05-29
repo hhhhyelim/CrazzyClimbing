@@ -17,4 +17,14 @@ public:
 private:
 	int cur_i;
 	int prevHold;
+
+	bool tutorial;
+	bool ready;
+	bool start;
+	bool game_start;
+	bool game_over;
+	bool game_ending;
+
+	int currentCharacterIndex;
+	bool correct_button;
 };

@@ -1,8 +1,7 @@
 #include "Game.h"
 //#include "GameHome.h"
-#include "GameIntro2.h"
 #include "GameMode2.h"
-#include "GameEnding2.h"
+//#include "GameEnding2.h"
 
 
 /////////////////////////////////////////////////
@@ -11,7 +10,6 @@ SDL_Window* g_window;
 SDL_Renderer* g_renderer;
 bool g_flag_running;
 Uint32 g_last_time_ms;
-
 
 // Game Phases
 int g_current_game_phase;
@@ -27,16 +25,14 @@ int main(int argc, char* argv[])
     InitGame();
 
     PhaseInterface* game_phases[8];
-    game_phases[PHASE_INTRO] = new Intro2;
     //game_phases[PHASE_HOME] = new Home;
     //game_phases[PHASE_MODE1] = new Mode1;
     game_phases[PHASE_MODE2] = new Mode2;
     //game_phases[PHASE_MODE3] = new Mode3;
-    //game_phases[PHASE_ENDING1] = new Ending1;
-    game_phases[PHASE_ENDING2] = new Ending2;
+    //game_phases[PHASE_ENDING2] = new Ending2;
     //game_phases[PHASE_ENDING3] = new Ending3;
 
-    g_current_game_phase = PHASE_INTRO;
+    g_current_game_phase = PHASE_MODE2;
 
     while (g_flag_running)
     {
@@ -50,8 +46,6 @@ int main(int argc, char* argv[])
         game_phases[g_current_game_phase]->Render();
 
         g_last_time_ms = cur_time_ms;
-
-
     }
 
     for (int i = 0; i < 8; i++) {
