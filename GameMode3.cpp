@@ -3,16 +3,7 @@
 #include <vector>
 
 
-int m3_result=0;
 
-// 게임 창 크기
-const int WINDOW_WIDTH = 800;
-const int WINDOW_HEIGHT = 600;
-
-const int CH_X = 360;
-const int CH_Y = 420;
-const int CH_WIDTH = 120;
-const int CH_HEIGHT = 144;
 
 // 돌 크기
 const int STONE_WIDTH = 64;
@@ -53,9 +44,10 @@ bool correct_button;
 Uint32 lastStonePressTime = 0;
 
 
-SDL_Rect chRect = { CH_X, CH_Y, CH_WIDTH, CH_HEIGHT };
+SDL_Texture* chTextures[2];
+SDL_Rect chRect;
 
-//SDL_Rect chRect;
+
 SDL_Texture* monkeyTextures[3];
 SDL_Rect monkeyRect;
 int monkeyFrame = 0;
@@ -65,8 +57,6 @@ int monkeyTimer = 0;
 
 Mode3::Mode3() {
 
-
-    
   
     //STATE
     tutorial = true;
@@ -76,12 +66,12 @@ Mode3::Mode3() {
     game_over = false;
     game_ending = false;
 
+    //result 1 = 게임오버/ result 1 = finish
+    result = 0;
 
     correct_button = false;
 
-    //m3_result = 0;
-    // 비정적 멤버 변수의 정의
-    
+
     // 원숭이 이미지 로드
     SDL_Surface* monkeySurface;
     for (int i = 0; i < 3; ++i)
@@ -104,6 +94,25 @@ Mode3::Mode3() {
 
     MONKEY_START_Y = 150;
 
+    currentCharacterIndex = 0;
+    //캐릭터
+    SDL_Surface* surface;
+    {
+        for (int i = 0; i < 2; ++i) {
+            std::string imagePath = "../../Resources/User" + std::to_string(i + 1) + ".png";
+            surface = IMG_Load(imagePath.c_str());
+            chTextures[i] = SDL_CreateTextureFromSurface(g_renderer, surface);
+            SDL_FreeSurface(surface);
+        }
+    }
+
+    // 원숭이 초기 위치 설정
+    chRect.x = 360;
+    chRect.y = CH_START_Y;
+    chRect.w = surface->w;
+    chRect.h = surface->h;
+
+    CH_START_Y = 420;
 
 
 
@@ -121,17 +130,7 @@ Mode3::Mode3() {
         }
     }
 
-    currentCharacterIndex = 0;
-    //캐릭터
-    {
-        for (int i = 0; i < 2; ++i) {
-            std::string imagePath = "../../Resources/User" + std::to_string(i + 1) + ".png";
-            SDL_Surface* surface = IMG_Load(imagePath.c_str());
-            chTextures[i] = SDL_CreateTextureFromSurface(g_renderer, surface);
-            SDL_FreeSurface(surface);
-        }
-    }
-
+  
 
     //Tutorial
     {
@@ -150,37 +149,13 @@ Mode3::Mode3() {
         g_tt_destination_rect.h = 450;
     }
 
-    // monkey
-  /*  {
-        SDL_Surface* temp_surface = IMG_Load("../../Resources/monkey.png");
-        texture_monkey = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
-        SDL_FreeSurface(temp_surface);
 
-        SDL_QueryTexture(texture_monkey, NULL, NULL, &source_rectangle_monkey.w, &source_rectangle_monkey.h);
-        source_rectangle_monkey.x = 0;
-        source_rectangle_monkey.y = 0;
+    // 배경 이미지 로드
+    bg_surface = IMG_Load("../../Resources/Mode3_bg_all.png");
+    bg_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface); // GPU로 옮기기 
+    SDL_FreeSurface(bg_surface);
+    backgroundY = -2400; 	// 배경 이미지 초기 위치 설정 (화면 위로)
 
-        destination_rectangle_monkey.w = 120;
-        destination_rectangle_monkey.h = 144;
-        destination_rectangle_monkey.x = 430;
-    }*/
-
-    //BackGround
-    {
-        SDL_Surface* bg_surface = IMG_Load("../../Resources/Mode3_bg.png");
-        g_bg_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface);
-        SDL_FreeSurface(bg_surface);
-
-        g_bg_source_rect.x = 0;
-        g_bg_source_rect.y = 0;
-        g_bg_source_rect.w = 800;
-        g_bg_source_rect.h = 600;
-
-        g_bg_destination_rect.x = 0;
-        g_bg_destination_rect.y = 0;
-        g_bg_destination_rect.w = 800;
-        g_bg_destination_rect.h = 600;
-    }
     //wall
     {
         SDL_Surface* bg_surface = IMG_Load("../../Resources/Mode3_wall.png");
@@ -274,11 +249,83 @@ Mode3::Mode3() {
 
     }
 
+    // game_ending
+    // 
+    // Finish
+    {
+        SDL_Surface* temp_surface = IMG_Load("../../Resources/finish.png");
+        texture_finish = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
+        SDL_FreeSurface(temp_surface);
+
+        SDL_QueryTexture(texture_finish, NULL, NULL, &source_rectangle_finish.w, &source_rectangle_finish.h);
+
+        source_rectangle_finish.x = 0;
+        source_rectangle_finish.y = 0;
+        source_rectangle_finish.w = 800;
+        source_rectangle_finish.h = 600;
+
+        destination_rectangle_finish.x = 30;
+        destination_rectangle_finish.y = 30;
+        destination_rectangle_finish.w = 700;
+        destination_rectangle_finish.h = 500;
+    }
+
+    // game over
+    {
+        SDL_Surface* temp_surface = IMG_Load("../../Resources/m3_gameover.png");
+        texture_gameover = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
+        SDL_FreeSurface(temp_surface);
+
+        SDL_QueryTexture(texture_gameover, NULL, NULL, &source_rectangle_gameover.w, &source_rectangle_gameover.h);
+
+        source_rectangle_gameover.x = 0;
+        source_rectangle_gameover.y = 0;
+        source_rectangle_gameover.w = 800;
+        source_rectangle_gameover.h = 600;
+
+        destination_rectangle_gameover.x = 0;
+        destination_rectangle_gameover.y = 0;
+        destination_rectangle_gameover.w = 800;
+        destination_rectangle_gameover.h = 600;
+    }
+
+    // Home Button
+    {
+        SDL_Surface* temp_surface = IMG_Load("../../Resources/home_button.png");
+        texture_hb = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
+        SDL_FreeSurface(temp_surface);
+
+        SDL_QueryTexture(texture_hb, NULL, NULL, &source_rectangle_hb.w, &source_rectangle_hb.h);
+        destination_rectangle_hb.x = 210;
+        destination_rectangle_hb.y = 480;
+        source_rectangle_hb.x = 0;
+        source_rectangle_hb.y = 0;
+
+        destination_rectangle_hb.w = 160;
+        destination_rectangle_hb.h = 80;
+    }
+
+    // Retry Button
+    {
+        SDL_Surface* temp_surface = IMG_Load("../../Resources/retry_button.png");
+        texture_rb = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
+        SDL_FreeSurface(temp_surface);
+
+        SDL_QueryTexture(texture_rb, NULL, NULL, &source_rectangle_rb.w, &source_rectangle_rb.h);
+        destination_rectangle_rb.x = 400;
+        destination_rectangle_rb.y = 480;
+        source_rectangle_rb.x = 0;
+        source_rectangle_rb.y = 0;
+
+        destination_rectangle_rb.w = 160;
+        destination_rectangle_rb.h = 80;
+    }
+
 }
 
 Mode3::~Mode3() {
     SDL_DestroyTexture(g_tt_texture);
-    SDL_DestroyTexture(g_bg_texture);
+    SDL_DestroyTexture(bg_texture);
     SDL_DestroyTexture(g_w_texture);
     SDL_DestroyTexture(texture_);
     SDL_DestroyTexture(texture_bb);
@@ -289,18 +336,20 @@ Mode3::~Mode3() {
     {
         SDL_DestroyTexture(monkeyTextures[i]);
     }
+    SDL_DestroyTexture(texture_finish);
+    SDL_DestroyTexture(texture_gameover);
+    SDL_DestroyTexture(texture_hb);
+    SDL_DestroyTexture(texture_rb);
 }
 
 void Mode3::Update()
 {
     Uint32 currentTime = SDL_GetTicks();
-    
+
     // Ready, Start
     if (ready) {
         if (currentTime - startTime >= 2000) {
-           
             startTime = currentTime;
-
             tutorial = false;
             ready = false;
             start = true;
@@ -326,73 +375,82 @@ void Mode3::Update()
     }
    
 
+    // game_start
     if (game_start && !game_over) {
-        // 중력 적용
+
+        // 원숭이 계속 위로 올라감 (중력 위로 적용)
         monkeyY -= 1;
+
         // 원숭이 애니메이션 및 이동 처리
         monkeyTimer++;
         if (monkeyTimer % 15 == 0) // 1초에 한 번씩 애니메이션 변경
         {
             monkeyFrame = (monkeyFrame + 1) % 2; // monkey1.png과 monkey2.png 사이에서 반복
         }
+
+        // 원숭이 잡힐 경우
         SDL_Rect intersection;
         if (SDL_IntersectRect(&chRect, &monkeyRect, &intersection) == SDL_TRUE && intersection.h >= 60)
         {
             gameoverTime = SDL_GetTicks();
             monkeyFrame = 2; // 원숭이 잡힌 경우 monkey3.png로 변경
+           
+            result = 2;
+            tutorial = false;
+            ready = false;
+            start = false;
+            game_start = false;
             game_over = true;
-            m3_result = 0;
-            //monkeyY += 5;
-            //SDL_Delay(3000);
+            game_ending = false;
         }
 
     }
+
+    // game_over
     if (game_over) {
-        monkeyY += 5;
+        if (result == 2) {
+            monkeyY += 5;
+        }
+        else if (result == 1) {
+            chY += 5;
+        }
+       
         // 현재 시간과 충돌 감지 시간 간의 차이 계산
         Uint32 elapsedTime = currentTime - gameoverTime;
 
-        // 3초가 경과한 경우 게임 오버 페이즈로 전환
-        if (game_over && elapsedTime >= 2000) {
-            g_current_game_phase = PHASE_ENDING3;
-            game_over = false;
+        // 2초가 경과한 경우 게임 엔딩으로 전환
+        if (game_over && elapsedTime >= 1000) {
+            tutorial = false;
             ready = false;
+            start = false;
+            game_start = false;
+            game_over = false;
+            game_ending = true;
         }
     }
 
-    if (game_start && !ready && !start) {
+    if (game_start) {
         if (stonesOnScreen == 0) {
             // 화면에 돌이 없는 경우 새로운 돌을 추가
             stoneNumbers.push_back(randomDistribution(randomEngine));
             stonesOnScreen = NUM_STONES;
         }
-        //velocityY += 1;
-
-
-        // 원숭이 속도 조절
-    /*    monkeyY -=0.5;*/
     }
+
     if (correct_button == true) {
         correct_button = false;
-        // Background Update
-        g_bg_destination_rect.y += 10;
-        if (g_bg_destination_rect.y >= 600) {
-            g_bg_destination_rect.y = 0;
-        }
-        g_w_destination_rect.y += 100;
-        if (g_w_destination_rect.y >= 600) {
-            g_w_destination_rect.y = 0;
-        }
+        backgroundY += 30;
+       
         monkeyY -= velocityY;
-        //velocityY -= monkeySpeed;
     }
-    //// 원숭이 위치 업데이트
-    //monkeyY += monkeySpeed;
-    //if (monkeyY <= 0) {
-    //    // 원숭이가 화면 위로 올라가면 게임 클리어
-    //    game_over = true;
-    //}
 
+    if (game_ending) {
+        tutorial = false;
+        ready = false;
+        start = false;
+        game_start = false;
+        game_over = false;
+    }
 
 }
 
@@ -401,20 +459,11 @@ void Mode3::Render() {
 
     SDL_RenderClear(g_renderer);
 
-    // Background Render
-    {
-        SDL_Rect tmp_r;
-        tmp_r.x = 0;
-        tmp_r.y = g_bg_destination_rect.y - 600;
-        tmp_r.w = g_bg_destination_rect.w;
-        tmp_r.h = g_bg_destination_rect.h;
-        SDL_RenderCopy(g_renderer, g_bg_texture, &g_bg_source_rect, &tmp_r);
-        tmp_r.x = 0;
-        tmp_r.y = g_bg_destination_rect.y;
-        tmp_r.w = g_bg_destination_rect.w;
-        tmp_r.h = g_bg_destination_rect.h;
-        SDL_RenderCopy(g_renderer, g_bg_texture, &g_bg_source_rect, &tmp_r);
-    }
+    //배경이어지기
+    SDL_Rect backgroundRect = { 0, backgroundY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT };
+    SDL_RenderCopy(g_renderer, bg_texture, NULL, &backgroundRect);
+
+    // Wall
     {
         SDL_Rect tmp_r;
         tmp_r.x = 250;
@@ -430,53 +479,40 @@ void Mode3::Render() {
     }
 
 
-    
-    //돌
    
-    // Back Button
-    SDL_RenderCopy(g_renderer, texture_bb, &source_rectangle_bb, &destination_rectangle_bb);
     if (tutorial) {
         //Tutorial
         SDL_RenderCopy(g_renderer, g_tt_texture, &g_tt_source_rect, &g_tt_destination_rect);
         // Start Button
         SDL_RenderCopy(g_renderer, texture_, &source_rectangle_, &destination_rectangle_);
+        // Back Button
+        SDL_RenderCopy(g_renderer, texture_bb, &source_rectangle_bb, &destination_rectangle_bb);
     }
-
     else if (ready) {
         SDL_RenderCopy(g_renderer, texture_ready, &source_rectangle_ready, &destination_rectangle_ready);
     }
-
     else if (start) {
         SDL_RenderCopy(g_renderer, texture_start, &source_rectangle_start, &destination_rectangle_start);
     }
-    else if (game_start) {
-        for (int i = 0; i < NUM_STONES; ++i) {
-            int stoneNumber = stoneNumbers[i];
-            SDL_Rect stoneRect = { STONE_X, STONE_Y - (STONE_SPACING * i), STONE_WIDTH, STONE_HEIGHT };
-            SDL_RenderCopy(g_renderer, stoneTextures[stoneNumber - 1], nullptr, &stoneRect);
-        }
+    else if (game_start || game_over) {
 
         //잡은 돌
         SDL_RenderCopy(g_renderer, g_caught_texture, &g_caught_source_rect, &g_caught_destination_rect);
 
         //캐릭터
-         // 캐릭터 출력
-        //SDL_Rect chRect = { CH_X, CH_Y, CH_WIDTH, CH_HEIGHT };
-        SDL_RenderCopy(g_renderer, chTextures[currentCharacterIndex], nullptr, &chRect);
-
-        //// monkey
-        //{
-        //    SDL_Rect tmp_r;
-        //    tmp_r.x = destination_rectangle_monkey.x;
-        //    tmp_r.y = monkeyY;
-        //    tmp_r.w = destination_rectangle_monkey.w;
-        //    tmp_r.h = destination_rectangle_monkey.h;
-        //    SDL_RenderCopy(g_renderer, texture_monkey, &source_rectangle_monkey, &tmp_r);
-        //}
-
-        //원숭이 그리기
         {
-             monkeyRect.y = monkeyY; // 원숭이의 Y 좌표 업데이트
+            chRect.y = chY; // 캐릭터 Y 좌표 업데이트
+            SDL_Rect tmp_r;
+            tmp_r.x = chRect.x;
+            tmp_r.y = chRect.y;
+            tmp_r.w = chRect.w;
+            tmp_r.h = chRect.h;
+            SDL_RenderCopy(g_renderer, chTextures[currentCharacterIndex], nullptr, &chRect);
+        }
+       
+        //원숭이
+        {
+            monkeyRect.y = monkeyY; // 원숭이의 Y 좌표 업데이트
             SDL_Rect tmp_r;
             tmp_r.x = monkeyRect.x;
             tmp_r.y = monkeyRect.y;
@@ -485,7 +521,30 @@ void Mode3::Render() {
             SDL_RenderCopy(g_renderer, monkeyTextures[monkeyFrame], nullptr, &tmp_r);
 
         }
-       
+        // 돌
+        for (int i = 0; i < NUM_STONES; ++i) {
+            int stoneNumber = stoneNumbers[i];
+            SDL_Rect stoneRect = { STONE_X, STONE_Y - (STONE_SPACING * i), STONE_WIDTH, STONE_HEIGHT };
+            SDL_RenderCopy(g_renderer, stoneTextures[stoneNumber - 1], nullptr, &stoneRect);
+        }
+        
+    }
+    else if (game_over) {
+
+    }
+    else if (game_ending) {
+        
+        if (result == 1) {
+            SDL_RenderCopy(g_renderer, texture_gameover, &source_rectangle_gameover, &destination_rectangle_gameover);
+        }
+        else if (result == 2) {
+            SDL_RenderCopy(g_renderer, texture_finish, &source_rectangle_finish, &destination_rectangle_finish);
+        }
+
+        // Home Button
+        SDL_RenderCopy(g_renderer, texture_hb, &source_rectangle_hb, &destination_rectangle_hb);
+        // Retry Button
+        SDL_RenderCopy(g_renderer, texture_rb, &source_rectangle_rb, &destination_rectangle_rb);
 
     }
 
@@ -493,26 +552,6 @@ void Mode3::Render() {
     SDL_RenderPresent(g_renderer);
 
 }
-
-//// 충돌 여부 확인 함수
-//bool Mode3::CheckCollision(int a) {
-//    //a = monkeyY;
-//    // 두 사각형이 충돌하는지 검사 or 원숭이 화면 밖으로 나가면
-//    if (monkeyY+144 >=450 || monkeyY+144<0) {
-//        return true;
-//    }
-//    
-//    else {
-//        return false;
-//    }
-//}
-
-// GameMode3.h 파일에 추가할 코드
-
-// Monkey 클래스 내에 멤버 함수로 get_monkeyY_value()를 구현합니다.
-//int Mode3::get_monkeyY_value() {
-//    return monkeyY;
-//}
 
 
 void Mode3::HandleEvents() {
@@ -538,17 +577,46 @@ void Mode3::HandleEvents() {
                     && mouseY >= destination_rectangle_bb.y && mouseY < destination_rectangle_bb.y + destination_rectangle_bb.h
                     && g_current_game_phase == PHASE_MODE3) {
                     g_current_game_phase = PHASE_HOME;
+                    tutorial = true;
                     ready = false;
                     start = false;
+                    game_start = false;
+                    game_over = false;
+                    game_ending = false;
+                }
+                //뒤로가기(home으로)
+                if (mouseX >= destination_rectangle_hb.x && mouseX < destination_rectangle_hb.x + destination_rectangle_hb.w
+                    && mouseY >= destination_rectangle_hb.y && mouseY < destination_rectangle_hb.y + destination_rectangle_hb.h
+                    && g_current_game_phase == PHASE_MODE3) {
+                    g_current_game_phase = PHASE_HOME;
                     tutorial = true;
+                    ready = false;
+                    start = false;
+                    game_start = false;
+                    game_over = false;
+                    game_ending = false;
+                }
+                //game restart
+                if (mouseX >= destination_rectangle_rb.x && mouseX < destination_rectangle_rb.x + destination_rectangle_rb.w
+                    && mouseY >= destination_rectangle_rb.y && mouseY < destination_rectangle_rb.y + destination_rectangle_rb.h
+                    && g_current_game_phase == PHASE_MODE3) {
+                    tutorial = true;
+                    ready = false;
+                    start = false;
+                    game_start = false;
+                    game_over = false;
+                    game_ending = false;
                 }
                 //game start
                 if (mouseX >= destination_rectangle_.x && mouseX < destination_rectangle_.x + destination_rectangle_.w
                     && mouseY >= destination_rectangle_.y && mouseY < destination_rectangle_.y + destination_rectangle_.h
                     && g_current_game_phase == PHASE_MODE3 && tutorial == true) {
-                    ready = true;
-                    start = true;
                     tutorial = false;
+                    ready = true;
+                    start = false;
+                    game_start = false;
+                    game_over = false;
+                    game_ending = false;
                     startTime = SDL_GetTicks();
                 }
 
@@ -562,6 +630,7 @@ void Mode3::HandleEvents() {
                     // 맞는 돌을 눌렀을 때 캐릭터 이미지 변경
                     currentCharacterIndex = (currentCharacterIndex + 1) % 2;
                     if (key == stoneNumbers[0]) {
+
                         // 올바른 숫자를 입력한 경우 돌들을 아래로 이동
                         stoneNumbers.erase(stoneNumbers.begin());
                         stoneNumbers.push_back(randomDistribution(randomEngine));
@@ -571,27 +640,13 @@ void Mode3::HandleEvents() {
                         lastStonePressTime = SDL_GetTicks();
 
                         velocityY -= monkeySpeed;
-                        //// 원숭이 속도 갱신
-                        //int timeInterval = lastStonePressTime - startTime;
-                        //if (timeInterval > 0) {
-                        //    monkeySpeed += 1+(int)(1000 / timeInterval); // 돌을 누르는 간격이 좁아질수록 속도가 a빨라짐
-                        //}
+                       
                     }
-
-                    //else if (monkeyY + 144 <= 0 || monkeyY + 144 >= 500) {
-                    //    // 두 사각형이 충돌하는지 검사 or 원숭이 화면 밖으로 나가면
-                    //    game_over = true;
-                    //    g_current_game_phase = PHASE_ENDING3;
-                    //}
-
                     else {
                         // 잘못된 숫자를 입력한 경우 게임 오버
+                        result = 1;
                         game_over = true;
                         gameoverTime = SDL_GetTicks();
-                        //SDL_Delay(3000);
-                        g_current_game_phase = PHASE_ENDING3;
-                        m3_result = 1;
-
                     }
 
                 }
