@@ -6,13 +6,13 @@
 #include <chrono>
 
 using namespace std;
-vector<string> hold_paths = { "../../Resources/m2/redHold.png", "../../Resources/m2/greenHold.png", "../../Resources/m2/blueHold.png" };
-vector<SDL_Surface*> hold_surfaces;
-vector<SDL_Texture*> hold_textures;
-vector<SDL_Rect> hold_rects;
-vector<SDL_Rect> hold_dest_rects;
+vector<string> hold2_paths = { "../../Resources/m2/redHold.png", "../../Resources/m2/greenHold.png", "../../Resources/m2/blueHold.png" };
+vector<SDL_Surface*> hold2_surfaces;
+vector<SDL_Texture*> hold2_textures;
+vector<SDL_Rect> hold2_rects;
+vector<SDL_Rect> hold2_dest_rects;
 
-string nextHoldPath = "";
+string nextHoldPath2 = "";
 
 Mode2::Mode2() {
 	g_flag_running = true;
@@ -88,36 +88,36 @@ Mode2::Mode2() {
 		} while (random_hold_idx == prevHoldIndex); // 현재 인덱스가 이전 인덱스와 같으면 새로운 인덱스를 계속 생성합니다
 		
 		prevHoldIndex = random_hold_idx;
-		string hold_path = hold_paths[random_hold_idx];
+		string hold_path = hold2_paths[random_hold_idx];
 		SDL_Surface* hold_surface = IMG_Load(hold_path.c_str());
 		SDL_Texture* hold_texture = SDL_CreateTextureFromSurface(g_renderer, hold_surface);
 		SDL_Rect hold_rect = { 0, 0, hold_surface->w, hold_surface->h };
 
-		hold_surfaces.push_back(hold_surface);
-		hold_textures.push_back(hold_texture);
-		hold_rects.push_back(hold_rect);
+		hold2_surfaces.push_back(hold_surface);
+		hold2_textures.push_back(hold_texture);
+		hold2_rects.push_back(hold_rect);
 
 		if (i % 2 == 0) {
 			SDL_Rect hold_dest_rect = { 315, leftHoldY , 50, 50 };
-			hold_dest_rects.push_back(hold_dest_rect);
+			hold2_dest_rects.push_back(hold_dest_rect);
 			leftHoldY -= 200;
 		}
 		else {
 			SDL_Rect hold_dest_rect = { 440, rightHoldY , 50, 50 };
-			hold_dest_rects.push_back(hold_dest_rect);
+			hold2_dest_rects.push_back(hold_dest_rect);
 			rightHoldY -= 200;
 		}
 
 		if (hold_path == "../../Resources/m2/redHold.png") {
-			nextHoldPath = hold_path;
+			nextHoldPath2 = hold_path;
 			hold[i] = 1;
 		}
 		else if (hold_path == "../../Resources/m2/greenHold.png") {
-			nextHoldPath = hold_path;
+			nextHoldPath2 = hold_path;
 			hold[i] = 2;
 		}
 		else if (hold_path == "../../Resources/m2/blueHold.png") {
-			nextHoldPath = hold_path;
+			nextHoldPath2 = hold_path;
 			hold[i] = 3;
 		}
 	}
@@ -172,7 +172,7 @@ Mode2::~Mode2() {
 	SDL_DestroyTexture(bg_texture);
 	SDL_DestroyTexture(wall_texture);
 
-	for (SDL_Texture* texture : hold_textures) {
+	for (SDL_Texture* texture : hold2_textures) {
 		SDL_DestroyTexture(texture);
 	}
 	SDL_DestroyTexture(leftUser_texture);
@@ -355,8 +355,8 @@ void Mode2::Render() {
 			}
 
 			//홀드그리기
-			for (size_t i = 0; i < hold_textures.size(); i++) {
-				SDL_RenderCopy(g_renderer, hold_textures[i], &hold_rects[i], &hold_dest_rects[i]);
+			for (size_t i = 0; i < hold2_textures.size(); i++) {
+				SDL_RenderCopy(g_renderer, hold2_textures[i], &hold2_rects[i], &hold2_dest_rects[i]);
 			}
 
 			//사람
@@ -401,7 +401,7 @@ void Mode2::userMove() {
 }
 
 void Mode2::holdMove() {
-	for (SDL_Rect& hold_dest_rect : hold_dest_rects) {
+	for (SDL_Rect& hold_dest_rect : hold2_dest_rects) {
 		hold_dest_rect.y += 100;
 	}
 }
@@ -557,13 +557,13 @@ void Mode2::HandleEvents() {
 		// Reset hold positions
 		leftHoldY = 475;
 		rightHoldY = 375;
-		for (size_t i = 0; i < hold_dest_rects.size(); i++) {
+		for (size_t i = 0; i < hold2_dest_rects.size(); i++) {
 			if (i % 2 == 0) {
-				hold_dest_rects[i].y = leftHoldY;
+				hold2_dest_rects[i].y = leftHoldY;
 				leftHoldY -= 200;
 			}
 			else {
-				hold_dest_rects[i].y = rightHoldY;
+				hold2_dest_rects[i].y = rightHoldY;
 				rightHoldY -= 200;
 			}
 		}
