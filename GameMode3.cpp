@@ -53,7 +53,7 @@ SDL_Rect monkeyRect;
 int monkeyFrame = 0;
 int monkeyTimer = 0;
 
-//int Mode3::m3_result = 1;
+
 
 Mode3::Mode3() {
 
@@ -583,6 +583,7 @@ void Mode3::HandleEvents() {
                     game_start = false;
                     game_over = false;
                     game_ending = false;
+                    ResetGame();
                 }
                 //뒤로가기(home으로)
                 if (mouseX >= destination_rectangle_hb.x && mouseX < destination_rectangle_hb.x + destination_rectangle_hb.w
@@ -595,6 +596,7 @@ void Mode3::HandleEvents() {
                     game_start = false;
                     game_over = false;
                     game_ending = false;
+                    ResetGame();
                 }
                 //game restart
                 if (mouseX >= destination_rectangle_rb.x && mouseX < destination_rectangle_rb.x + destination_rectangle_rb.w
@@ -606,6 +608,7 @@ void Mode3::HandleEvents() {
                     game_start = false;
                     game_over = false;
                     game_ending = false;
+                    ResetGame();
                 }
                 //game start
                 if (mouseX >= destination_rectangle_.x && mouseX < destination_rectangle_.x + destination_rectangle_.w
@@ -618,6 +621,7 @@ void Mode3::HandleEvents() {
                     game_over = false;
                     game_ending = false;
                     startTime = SDL_GetTicks();
+           
                 }
 
             }
@@ -658,4 +662,35 @@ void Mode3::HandleEvents() {
 
         }
     }
+}
+
+void Mode3::ResetGame() {
+
+    monkeyY = 100;
+    //result 1 = 게임오버/ result 1 = finish
+    result = 0;
+    velocityY = 0;
+    correct_button = false;
+
+    // 원숭이 초기 위치 설정
+    MONKEY_START_Y = 150;
+    monkeyRect.x = 430;
+    monkeyRect.y = MONKEY_START_Y;
+
+    
+
+    currentCharacterIndex = 0;
+
+    // 캐릭터 초기 위치 설정
+    CH_START_Y = 420;
+    chRect.x = 360;
+    chRect.y = CH_START_Y;
+    chY = 420;
+
+  
+
+    backgroundY = -2400; 	// 배경 이미지 초기 위치 설정 (화면 위로)
+
+
+
 }
