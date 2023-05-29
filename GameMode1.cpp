@@ -96,6 +96,21 @@ SDL_Texture* stun_texture;
 SDL_Rect stun_rect;
 SDL_Rect stun_dest_rect;
 
+// ending BG
+SDL_Texture* g_texture_ending;
+SDL_Rect g_source_rectangle_ending;
+SDL_Rect g_destination_rectangle_ending;
+
+// ending home button
+SDL_Texture* g_texture_home;
+SDL_Rect g_source_rectangle_home;
+SDL_Rect g_destination_rectangle_home;
+
+// ending retry button
+SDL_Texture* g_texture_retry;
+SDL_Rect g_source_rectangle_retry;
+SDL_Rect g_destination_rectangle_retry;
+
 
 int hold[41]; // 1:down 2:left 3: right 4: up
 int f_state; // 1:down 2:left 3: right 4: up
@@ -119,16 +134,19 @@ Mode1::Mode1() {
 	start = false;
 	game_start = false;
 	game_over = false;
+	game_ending = false;
 
-	
+
 
 	// intro (tutorial)
-	SDL_Surface* temp_surface = IMG_Load("../src/tutorial_mode1.png");
-	g_texture_intro = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
-	SDL_FreeSurface(temp_surface);
-	SDL_QueryTexture(g_texture_intro, NULL, NULL, &g_source_rectangle_intro.w, &g_source_rectangle_intro.h);
-	g_source_rectangle_intro = { 0, 0, 800, 600 };
-	g_destination_rectangle_intro = { 95, 40, 620, 480 };
+	{
+		SDL_Surface* temp_surface = IMG_Load("../src/tutorial_mode1.png");
+		g_texture_intro = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
+		SDL_FreeSurface(temp_surface);
+		SDL_QueryTexture(g_texture_intro, NULL, NULL, &g_source_rectangle_intro.w, &g_source_rectangle_intro.h);
+		g_source_rectangle_intro = { 0, 0, 800, 600 };
+		g_destination_rectangle_intro = { 95, 40, 620, 480 };
+	}
 
 	// play Button (Start button)
 	SDL_Surface* play_surface = IMG_Load("../src/play.png");
@@ -152,7 +170,7 @@ Mode1::Mode1() {
 	SDL_FreeSurface(ready_surface);
 	ready_rect = { 0, 0, ready_surface->w,ready_surface->h };
 	ready_dest_rect = { 10, 10, ready_surface->w, ready_surface->h };
-	
+
 	// start
 	start_surface = IMG_Load("../src/start.png");
 	start_texture = SDL_CreateTextureFromSurface(g_renderer, start_surface);
@@ -172,7 +190,7 @@ Mode1::Mode1() {
 	wall_texture = SDL_CreateTextureFromSurface(g_renderer, wall_surface);
 	SDL_FreeSurface(wall_surface);
 	wallY = -4800;
-
+	
 	// timeBg
 	timeBg_surface = IMG_Load("../src/timeBg.png");
 	timeBg_texture = SDL_CreateTextureFromSurface(g_renderer, timeBg_surface);
@@ -252,6 +270,33 @@ Mode1::Mode1() {
 	stun_rect = { 0, 0, stun_surface->w, stun_surface->h };
 	stun_dest_rect = { 0, 0, stun_surface->w, stun_surface->h };
 	*/
+
+	//For Texture
+	{
+		SDL_Surface* temp_surface = IMG_Load("../src/gameclear.png");
+		g_texture_ending = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
+		SDL_FreeSurface(temp_surface);
+		SDL_QueryTexture(g_texture_ending, NULL, NULL, &g_source_rectangle_ending.w, &g_source_rectangle_ending.h);
+		g_source_rectangle_ending = { 0, 0, temp_surface->w, temp_surface->h };
+		g_destination_rectangle_ending = { 0, 0, temp_surface->w, temp_surface->h };
+	}
+
+	//home
+	
+	SDL_Surface* home_surface = IMG_Load("../src/home.png");
+	g_texture_home = SDL_CreateTextureFromSurface(g_renderer, home_surface);
+	SDL_FreeSurface(home_surface);
+	SDL_QueryTexture(g_texture_home, NULL, NULL, &g_source_rectangle_home.w, &g_source_rectangle_home.h);
+	g_source_rectangle_home = { 0, 0, 160, 80 };
+	g_destination_rectangle_home = { 210, 485, 160, 80 };
+
+	//retry
+	SDL_Surface* retry_surface = IMG_Load("../src/retry.png");
+	g_texture_retry = SDL_CreateTextureFromSurface(g_renderer, retry_surface);
+	SDL_FreeSurface(retry_surface);
+	SDL_QueryTexture(g_texture_retry, NULL, NULL, &g_source_rectangle_retry.w, &g_source_rectangle_retry.h);
+	g_source_rectangle_retry = { 0, 0, 160, 80 };
+	g_destination_rectangle_retry = { 440, 485, 160, 80 };
 }
 
 Mode1::~Mode1() {
@@ -271,7 +316,9 @@ Mode1::~Mode1() {
 	SDL_DestroyTexture(rightUser_texture);
 	SDL_DestroyTexture(introBack_texture);
 
-
+	SDL_DestroyTexture(g_texture_ending);
+	SDL_DestroyTexture(g_texture_home);
+	SDL_DestroyTexture(g_texture_retry);
 }
 
 void Mode1::Update()
@@ -290,8 +337,7 @@ void Mode1::Update()
 			start = true;
 			game_start = false;
 			game_over = false;
-
-
+			game_ending = false;
 		}
 	}
 	else if (start) {
@@ -304,7 +350,7 @@ void Mode1::Update()
 			start = false;
 			game_start = true;
 			game_over = false;
-			
+			game_ending = false;
 		}
 	}
 	if (game_start && !game_over) {
@@ -325,7 +371,7 @@ void Mode1::Update()
 
 		// 텍스처의 크기 및 위치 설정
 		SDL_QueryTexture(time_texture, NULL, NULL, &(time_rect.w), &(time_rect.h));
-		time_rect.x = 47;
+		time_rect.x = 50;
 		time_rect.y = 28;
 
 
@@ -341,16 +387,32 @@ void Mode1::Update()
 
 		if (cur_i == 40) {
 			gameoverTime = SDL_GetTicks();
+			tutorial = false;
+			ready = false;
+			start = false;
+			game_start = false;
 			game_over = true;
+			game_ending = false;
+			
 		}
 	}
 	if (game_over) {
 		Uint32 elapsedTime = currentTime - gameoverTime;
 		if (game_over && elapsedTime >= 2000) {
-			g_current_game_phase = PHASE_ENDING1;
-			game_over = false;
+			tutorial = false;
 			ready = false;
+			start = false;
+			game_start = false;
+			game_over = false;
+			game_ending = true;
 		}
+	}
+	if (game_ending) {
+		tutorial = false;
+		ready = false;
+		start = false;
+		game_start = false;
+		game_over = false;
 	}
 	
 }
@@ -389,12 +451,12 @@ void Mode1::Render() {
 		
 		SDL_RenderCopy(g_renderer, start_texture, &start_rect, &start_dest_rect);
 	}
-	/*
-	else if (game_start) {
-
+	else if (game_ending) {
+		SDL_RenderCopy(g_renderer, g_texture_ending, &g_source_rectangle_ending, &g_destination_rectangle_ending);
+		SDL_RenderCopy(g_renderer, g_texture_home, &g_source_rectangle_home, &g_destination_rectangle_home);
+		SDL_RenderCopy(g_renderer, g_texture_retry, &g_source_rectangle_retry, &g_destination_rectangle_retry);
 
 	}
-	*/	
 
 	SDL_RenderPresent(g_renderer);
 }
@@ -463,25 +525,63 @@ void Mode1::HandleEvents() {
 				int mouse_x = event.button.x;
 				int mouse_y = event.button.y;
 
-				/*
-				// introBack 버튼
-				if (mouse_x >= ready_dest_rect.x &&
-					mouse_x <= ready_dest_rect.x + ready_dest_rect.w &&
-					mouse_y >= ready_dest_rect.y &&
-					mouse_y <= ready_dest_rect.y + ready_dest_rect.h) {
-					// g_current_game_phase = PHASE_HOME;
 				
+				// introBack 버튼
+				if (mouse_x >= introBack_dest_rect.x &&
+					mouse_x <= introBack_dest_rect.x + introBack_dest_rect.w &&
+					mouse_y >= introBack_dest_rect.y &&
+					mouse_y <= introBack_dest_rect.y + introBack_dest_rect.h) {
+					//g_current_game_phase = PHASE_HOME;
+					tutorial = true;
+					ready = false;
+					start = false;
+					game_start = false;
+					game_over = false;
+					game_ending = false;
 				}
-				*/
+				
 				// game start 버튼
 				if (mouse_x >= g_destination_rectangle_play.x &&
 					mouse_x <= g_destination_rectangle_play.x + g_destination_rectangle_play.w &&
 					mouse_y >= g_destination_rectangle_play.y &&
 					mouse_y <= g_destination_rectangle_play.y + g_destination_rectangle_play.h) {
-					ready = true;
-					start = true;
 					tutorial = false;
+					ready = true;
+					start = false;
+					game_start = false;
+					game_over = false;
+					game_ending = false;
 					startTime = SDL_GetTicks();
+				}
+
+				// home 버튼
+				if (mouse_x >= g_destination_rectangle_home.x &&
+					mouse_x <= g_destination_rectangle_home.x + g_destination_rectangle_home.w &&
+					mouse_y >= g_destination_rectangle_home.y &&
+					mouse_y <= g_destination_rectangle_home.y + g_destination_rectangle_home.h)
+				{
+					//g_current_game_phase = PHASE_HOME;
+					tutorial = true;
+					ready = false;
+					start = false;
+					game_start = false;
+					game_over = false;
+					game_ending = false;
+				}
+
+				// game retry 버튼
+				if (mouse_x >= g_destination_rectangle_retry.x &&
+					mouse_x <= g_destination_rectangle_retry.x + g_destination_rectangle_retry.w &&
+					mouse_y >= g_destination_rectangle_retry.y &&
+					mouse_y <= g_destination_rectangle_retry.y + g_destination_rectangle_retry.h)
+				{
+					ResetGame();
+					tutorial = true;
+					ready = false;
+					start = false;
+					game_start = false;
+					game_over = false;
+					game_ending = false;
 				}
 			}
 
@@ -539,20 +639,22 @@ void Mode1::HandleEvents() {
 	}
 
 }
-/*
+
 
 void Mode1::ResetGame() {
 	f_state = 0;
 	cur_i = 1;
 	prevHold = 0;
 
-	// wall_dest_rect.y = 0;
-	// bg_dest_rect.y = 0;
+	wallY = -4800;
+	backgroundY = -1200;
 
-	isLeftUser = true;
-	leftUser_dest_rect = { 280, 427, leftUser_surface->w, leftUser_surface->h };
-	rightUser_dest_rect = { 410, 427, rightUser_surface->w, rightUser_surface->h };
-	isLeftUser = true;
+	userMove();
+	//isLeftUser = !isLeftUser;
+	leftUser_dest_rect.x = 280;
+	rightUser_dest_rect.x = 410;
+	//leftUser_dest_rect = { 280, 427, leftUser_surface->w, leftUser_surface->h };
+	//rightUser_dest_rect = { 410, 427, rightUser_surface->w, rightUser_surface->h };
 
 	// Reset hold positions
 	leftHoldY = 475;
@@ -567,5 +669,5 @@ void Mode1::ResetGame() {
 			rightHoldY -= 200;
 		}
 	}
+	
 }
-*/
