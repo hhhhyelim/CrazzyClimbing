@@ -10,6 +10,15 @@ using namespace std;
 Uint32 startTime = 0;
 Uint32 gameoverTime = 0;
 
+//홀드갯수 폰트
+int holdCount = 0;
+
+// num
+TTF_Font* font;
+SDL_Surface* num_surface;
+SDL_Texture* num_texture;
+SDL_Rect num_rect;
+
 //인트로
 SDL_Texture* g_texture_intro;
 SDL_Rect g_source_rectangle_intro;
@@ -249,6 +258,9 @@ Mode2::Mode2() {
 	SDL_QueryTexture(g_texture_retry, NULL, NULL, &g_source_rectangle_retry.w, &g_source_rectangle_retry.h);
 	g_source_rectangle_retry = { 0, 0, 160, 80 };
 	g_destination_rectangle_retry = { 440, 435, 160, 80 };
+
+	// num
+	font = TTF_OpenFont("../src/DungGeunMo.ttf", 60);
 }
 
 Mode2::~Mode2() {
@@ -268,6 +280,8 @@ Mode2::~Mode2() {
 	SDL_DestroyTexture(g_texture_ending);
 	SDL_DestroyTexture(g_texture_home);
 	SDL_DestroyTexture(g_texture_retry);
+
+	//SDL_DestroyTexture(numBg_texture);
 }
 
 void Mode2::Update()
@@ -310,6 +324,7 @@ void Mode2::Update()
 			cur_i++;
 			gauge += 5;
 			backgroundY += 30;
+			holdCount++;
 
 			if (cur_i >= 50) { //홀드 50개 넘으면 스피드 업!
 				gaugeDecreaseRate = gaugeDecreaseRate2;
@@ -357,6 +372,20 @@ void Mode2::Update()
 		start = false;
 		game_start = false;
 		game_over = false;
+
+		// 시간을 화면에 표시하기 위해 문자열로 변환
+		std::string gameTimeString = std::to_string(holdCount);
+
+		SDL_Color black = { 0, 0, 0, 0 };
+		num_surface = TTF_RenderText_Blended(font, gameTimeString.c_str(), black);
+
+		// 표면을 텍스처로 변환
+		num_texture = SDL_CreateTextureFromSurface(g_renderer, num_surface);
+		SDL_FreeSurface(num_surface);
+
+		SDL_QueryTexture(num_texture, NULL, NULL, &(num_rect.w), &(num_rect.h));
+		num_rect.x = 630;
+		num_rect.y = 303;
 	}
 }
 
@@ -429,17 +458,22 @@ void Mode2::Render() {
 			for (size_t i = 0; i < hold_textures.size(); i++) {
 				SDL_RenderCopy(g_renderer, hold_textures[i], &hold_rects[i], &hold_dest_rects[i]);
 			}
-			SDL_RenderCopy(g_renderer, leftUser_texture, &leftUser_rect, &leftUser_dest_rect);
 
+			//사람
+			SDL_RenderCopy(g_renderer, leftUser_texture, &leftUser_rect, &leftUser_dest_rect);
 		}
 		else if (game_ending) {
 			SDL_RenderCopy(g_renderer, g_texture_ending, &g_source_rectangle_ending, &g_destination_rectangle_ending);
 			SDL_RenderCopy(g_renderer, g_texture_home, &g_source_rectangle_home, &g_destination_rectangle_home);
 			SDL_RenderCopy(g_renderer, g_texture_retry, &g_source_rectangle_retry, &g_destination_rectangle_retry);
 
+			// 홀드 개수 출력
+			SDL_RenderCopy(g_renderer, num_texture, NULL, &num_rect);
+			
 		}
 		SDL_RenderPresent(g_renderer);
 	}
+
 
 void Mode2::userMove() {
 	//배경 아래로 움직이기
@@ -538,7 +572,7 @@ void Mode2::HandleEvents() {
 					game_start = false;
 					game_over = false;
 					game_ending = false;
-					// g_current_game_phase = PHASE_MODE2;
+					ResetGame();
 				}
 
 				// home 버튼
@@ -553,12 +587,13 @@ void Mode2::HandleEvents() {
 					game_start = false;
 					game_over = false;
 					game_ending = false;
+					ResetGame();
 				}
 			}
 				break;
 
 		case SDL_KEYDOWN:
-			if (!ready && !start && event.key.keysym.sym)
+			if (!tutorial && !ready && !start && event.key.keysym.sym)
 			{
 				if (event.key.keysym.sym == SDLK_r) {
 					f_state = 1;
@@ -590,7 +625,6 @@ void Mode2::HandleEvents() {
 					game_start = false;
 					game_over = true;
 					game_ending = true;
-					ResetGame();
 				}
 				break;
 
@@ -612,6 +646,7 @@ void Mode2::HandleEvents() {
 		cur_i = 1;
 		prevHold = 0;
 		gauge = 150;
+		holdCount = 0;
 
 		backgroundY = -2400;
 
