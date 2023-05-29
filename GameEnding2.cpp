@@ -20,7 +20,7 @@ Ending2::Ending2() {
 	SDL_FreeSurface(temp_surface);
 	SDL_QueryTexture(g_texture_ending, NULL, NULL, &g_source_rectangle_ending.w, &g_source_rectangle_ending.h);
 	g_source_rectangle_ending = { 0, 0, 800, 600 };
-	g_destination_rectangle_ending = { 0, -70, 800, 670 };
+	g_destination_rectangle_ending = { 0, 0, 800, 600 };
 
 	//home
 	SDL_Surface* home_surface = IMG_Load("../src/home.png");
@@ -28,7 +28,7 @@ Ending2::Ending2() {
 	SDL_FreeSurface(home_surface);
 	SDL_QueryTexture(g_texture_home, NULL, NULL, &g_source_rectangle_home.w, &g_source_rectangle_home.h);
 	g_source_rectangle_home = { 0, 0, 160, 80 };
-	g_destination_rectangle_home = { 210, 485, 160, 80 };
+	g_destination_rectangle_home = { 210, 435, 160, 80 };
 
 	//retry
 	SDL_Surface* retry_surface = IMG_Load("../src/retry.png");
@@ -36,7 +36,7 @@ Ending2::Ending2() {
 	SDL_FreeSurface(retry_surface);
 	SDL_QueryTexture(g_texture_retry, NULL, NULL, &g_source_rectangle_retry.w, &g_source_rectangle_retry.h);
 	g_source_rectangle_retry = { 0, 0, 160, 80 };
-	g_destination_rectangle_retry = { 440, 485, 160, 80 };
+	g_destination_rectangle_retry = { 440, 435, 160, 80 };
 }
 
 Ending2::~Ending2() {
@@ -57,7 +57,6 @@ void Ending2::Render() {
 	SDL_RenderCopy(g_renderer, g_texture_retry, &g_source_rectangle_retry, &g_destination_rectangle_retry);
 
 	SDL_RenderPresent(g_renderer);
-
 }
 
 void Ending2::HandleEvents() {
@@ -80,6 +79,7 @@ void Ending2::HandleEvents() {
 					mouse_x <= g_destination_rectangle_retry.x + g_destination_rectangle_retry.w &&
 					mouse_y >= g_destination_rectangle_retry.y &&
 					mouse_y <= g_destination_rectangle_retry.y + g_destination_rectangle_retry.h)
+					
 					g_current_game_phase = PHASE_MODE2;
 
 				else if (mouse_x >= g_destination_rectangle_home.x &&

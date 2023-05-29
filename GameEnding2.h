@@ -12,8 +12,6 @@ public:
 	virtual void Update();
 	virtual void Render();
 
-	void ResetGame();
-
 private:
 	//Background
 	SDL_Rect g_bg_source_rect;
@@ -34,5 +32,4 @@ private:
 	SDL_Texture* texture_retry;
 	SDL_Rect source_rectangle_retry;
 	SDL_Rect destination_rectangle_retry;
-
 };
