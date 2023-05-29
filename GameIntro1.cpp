@@ -153,7 +153,7 @@ void Intro1::HandleEvents() {
 					SDL_RenderCopy(g_renderer, ready_texture, &ready_rect, &ready_dest_rect);
 					SDL_RenderPresent(g_renderer);
 					SDL_Delay(2000);  // Delay for 3 seconds
-					SDL_DestroyTexture(ready_texture);
+					//SDL_DestroyTexture(ready_texture);
 
 					//시작버튼
 					SDL_RenderClear(g_renderer);
@@ -162,7 +162,7 @@ void Intro1::HandleEvents() {
 					SDL_RenderCopy(g_renderer, start_texture, &start_rect, &start_dest_rect);
 					SDL_RenderPresent(g_renderer);
 					SDL_Delay(1000);  // Delay for 1 seconds
-					SDL_DestroyTexture(start_texture);
+					//SDL_DestroyTexture(start_texture);
 				}
 			}
 			break;

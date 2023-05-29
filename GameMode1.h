@@ -14,9 +14,10 @@ public:
 	void userMove();
 	void holdMove();
 	bool checkHold();
-	void ResetGame();
-	void stun_effect();
+	//void ResetGame();
+	//void stun_effect();
 private:
 	int cur_i;
 	int prevHold;
+	
 };

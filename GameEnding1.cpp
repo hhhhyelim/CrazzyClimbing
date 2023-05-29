@@ -19,20 +19,13 @@ static SDL_Rect g_destination_rectangle_retry;
 
 Ending1::Ending1() {
 	//For Texture
-	SDL_Surface* temp_surface = IMG_Load("../src/bg_mode1.png");
+	SDL_Surface* temp_surface = IMG_Load("../src/gameclear.png");
 	g_texture_ending = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
 	SDL_FreeSurface(temp_surface);
 	SDL_QueryTexture(g_texture_ending, NULL, NULL, &g_source_rectangle_ending.w, &g_source_rectangle_ending.h);
-	g_source_rectangle_ending = { 0, 0, 800, 600 };
-	g_destination_rectangle_ending = { 0, -70, 800, 670 };
+	g_source_rectangle_ending = { 0, 0, temp_surface->w, temp_surface->h };
+	g_destination_rectangle_ending = { 0, 0, temp_surface->w, temp_surface->h };
 
-	//finish
-	SDL_Surface* fin_surface = IMG_Load("../src/finish.png");
-	g_texture_finish = SDL_CreateTextureFromSurface(g_renderer, fin_surface);
-	SDL_FreeSurface(fin_surface);
-	SDL_QueryTexture(g_texture_finish, NULL, NULL, &g_source_rectangle_finish.w, &g_source_rectangle_finish.h);
-	g_source_rectangle_finish = { 100, 110, 600, 330 };
-	g_destination_rectangle_finish = { 110, 80, g_source_rectangle_finish.w, g_source_rectangle_finish.h };
 
 	//home
 	SDL_Surface* home_surface = IMG_Load("../src/home.png");

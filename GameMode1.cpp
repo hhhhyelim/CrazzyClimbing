@@ -40,13 +40,6 @@ SDL_Surface* time_surface;
 SDL_Texture* time_texture;
 SDL_Rect time_rect;
 
-/*
-// 게임 시작 시간
-std::chrono::steady_clock::time_point startTime;
-// 종료 조건
-const int MAX_HOLDS = 40; // 최대 홀드 개수
-int completedHolds = 0;   // 완료된 홀드 개수// hold
-*/
 
 // hold
 vector<string> hold_paths = { "../src/downHold.png", "../src/leftHold.png", "../src/rightHold.png", "../src/upHold.png" };
@@ -80,33 +73,33 @@ SDL_Surface* stun_surface;
 SDL_Texture* stun_texture;
 SDL_Rect stun_rect;
 SDL_Rect stun_dest_rect;
-bool showStunEffect = false;
-std::chrono::steady_clock::time_point stunEffectStartTime;
 
-int hold[100]; // 1:down 2:left 3: right 4: up
+
+int hold[41]; // 1:down 2:left 3: right 4: up
 int f_state; // 1:down 2:left 3: right 4: up
 bool isLeftUser = true;
 string nextHoldPath = "";
 int prevHoldIndex = -1;
-// Uint32 startTime = 0;
+Uint32 startsTime;
 
 
 Mode1::Mode1() {
 	g_flag_running = true;
 	cur_i = 1;
 	prevHold = 0;
+	startsTime = SDL_GetTicks();
 
 	// 배경 이미지 로드
-	
+
 	bg_surface = IMG_Load("../src/bg_mode1.png");
 	bg_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface); // GPU로 옮기기 
 	SDL_FreeSurface(bg_surface);
 	backgroundY = -1200; 	// 배경 이미지 초기 위치 설정 (화면 위로)
-	
-	
+
+
 	// wall 이미지 로드
 	wall_surface = IMG_Load("../src/wall_mode1.png");
-	wall_texture = SDL_CreateTextureFromSurface(g_renderer, wall_surface); 
+	wall_texture = SDL_CreateTextureFromSurface(g_renderer, wall_surface);
 	SDL_FreeSurface(wall_surface);
 	wallY = -4800;
 
@@ -117,16 +110,9 @@ Mode1::Mode1() {
 	timeBg_rect = { 0, 0, timeBg_surface->w, timeBg_surface->h };
 	timeBg_dest_rect = { 30, 20, timeBg_surface->w, timeBg_surface->h };
 
-	//time
-	/*
-	startTime = std::chrono::steady_clock::now();
-	font = TTF_OpenFont("../src/DungGeunMo.ttf", 17);
-	SDL_Color black = { 0, 0, 0, 0 }; // 마지막은 투명도
-	time_surface = TTF_RenderText_Solid(font, gameTimeString.c_str(), black);
-	time_texture= SDL_CreateTextureFromSurface(g_renderer, time_surface);
-	*/
-	
-	
+	// time
+	font = TTF_OpenFont("../src/DungGeunMo.ttf", 30);
+
 	// hold 이미지 로드
 	srand((unsigned)time(NULL)); // srand는 한 번만 호출해야 합니다.
 	for (int i = 0; i < 40; i++) {
@@ -144,8 +130,8 @@ Mode1::Mode1() {
 		hold_textures.push_back(hold_texture);
 		SDL_Rect hold_rect = { 0, 0, hold_surface->w, hold_surface->h };
 		hold_rects.push_back(hold_rect);
-	
-		
+
+
 		if (i % 2 == 0) {
 			SDL_Rect hold_dest_rect = { 300, leftHoldY , hold_surface->w, hold_surface->h }; // 원래 270
 			hold_dest_rects.push_back(hold_dest_rect);
@@ -196,45 +182,64 @@ Mode1::Mode1() {
 	back_rect = { 0, 0, back_surface->w, back_surface->h };
 	back_dest_rect = { 10, 10, back_surface->w, back_surface->h };
 
-	
-
-
+	/*
+	stun_surface = IMG_Load("../src/stun.png");
+	stun_texture = SDL_CreateTextureFromSurface(g_renderer, stun_surface);
+	SDL_FreeSurface(stun_surface);
+	stun_rect = { 0, 0, stun_surface->w, stun_surface->h };
+	stun_dest_rect = { 0, 0, stun_surface->w, stun_surface->h };
+	*/
 }
 
 Mode1::~Mode1() {
-	
+
 	SDL_DestroyTexture(bg_texture);
 	SDL_DestroyTexture(wall_texture);
 	//SDL_DestroyTexture(time_texture);
 	SDL_DestroyTexture(timeBg_texture);
-	
+
 	for (SDL_Texture* texture : hold_textures) {
 		SDL_DestroyTexture(texture);
 	}
 	SDL_DestroyTexture(leftUser_texture);
 	SDL_DestroyTexture(rightUser_texture);
 	SDL_DestroyTexture(back_texture);
-	
+
 }
 
 void Mode1::Update()
 {
-	if (showStunEffect) {
-		// stun 효과를 보여줄 때에는 해당 동작을 수행하지 않음
-		// 다른 처리 가능
-		return;
-	}
+	Uint32 currentTime = SDL_GetTicks();  // 현재 시간 가져오기
+	Uint32 elapsedTime = currentTime - startsTime;  // 경과 시간 계산
+	Uint32 seconds = currentTime / 1000;  // 경과 시간을 초로 변환
 
-	if (checkHold()==true) {
+	// 시간을 화면에 표시하기 위해 문자열로 변환
+	std::string gameTimeString = "Time:" + std::to_string(seconds) + "s";
+
+	// 문자열을 표시할 표면 생성
+	SDL_Color black = { 0, 0, 0, 0 };
+	time_surface = TTF_RenderText_Solid(font, gameTimeString.c_str(), black);
+
+	// 표면을 텍스처로 변환
+	time_texture = SDL_CreateTextureFromSurface(g_renderer, time_surface);
+	SDL_FreeSurface(time_surface);
+
+	// 텍스처의 크기 및 위치 설정
+	SDL_QueryTexture(time_texture, NULL, NULL, &(time_rect.w), &(time_rect.h));
+	time_rect.x = 47;
+	time_rect.y = 28;
+
+
+	if (checkHold() == true) {
 		userMove();
 		holdMove();
 		cur_i++;
-		
+
 		backgroundY += 30;
 		wallY += 118;
 
 	}
-	
+
 
 }
 
@@ -248,53 +253,24 @@ void Mode1::Render() {
 	//벽이어지기
 	SDL_Rect wallRect = { 200, wallY, WALL_WIDTH, WALL_HEIGHT };
 	SDL_RenderCopy(g_renderer, wall_texture, NULL, &wallRect);
-	
-	
-	//SDL_RenderCopy(g_renderer, time_texture, NULL, &time_rect);
-	
+
+
+	SDL_RenderCopy(g_renderer, time_texture, NULL, &time_rect);
+
 
 	for (size_t i = 0; i < hold_textures.size(); i++) {
 		SDL_RenderCopy(g_renderer, hold_textures[i], &hold_rects[i], &hold_dest_rects[i]);
 	}
 	SDL_RenderCopy(g_renderer, leftUser_texture, &leftUser_rect, &leftUser_dest_rect);
 	SDL_RenderCopy(g_renderer, timeBg_texture, &timeBg_rect, &timeBg_dest_rect);
+	SDL_RenderCopy(g_renderer, time_texture, NULL, &time_rect);
+
 	
-	// stun 효과
-	
-	if (showStunEffect)
-	{
-		stun_effect();
-	}
-	showStunEffect = false;
 
 	SDL_RenderPresent(g_renderer);
 }
-
-void Mode1::stun_effect() {
-
-	// stun 효과
-	stun_surface = IMG_Load("../src/stun.png");
-	stun_texture = SDL_CreateTextureFromSurface(g_renderer, stun_surface);
-	SDL_FreeSurface(stun_surface);
-	stun_rect = { 0, 0, stun_surface->w, stun_surface->h };
-	stun_dest_rect = { 0, 0, stun_surface->w, stun_surface->h };
-
-	/*
-	std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
-	std::chrono::duration<double> elapsedTime = currentTime - stunEffectStartTime;
-	if (elapsedTime.count() < 1.0) {
-		SDL_RenderCopy(g_renderer, stun_texture, &stun_rect, &stun_dest_rect);
-	}
-	else {
-		showStunEffect = false;
-	}
-	*/
-}
-
 // bg, wall 아래로 내려가고 user는 좌우 움직이기
 void Mode1::userMove() {
-	//bg_dest_rect.y += 5;
-	//wall_dest_rect.y += 30;
 	
 
 	if (isLeftUser) {
@@ -321,16 +297,9 @@ void Mode1::holdMove() {
 	for (SDL_Rect& hold_dest_rect : hold_dest_rects) {
 		hold_dest_rect.y += 100;
 	}
-	bool allHoldsOffScreen = true;
-	for(const SDL_Rect& hold_dest_rect : hold_dest_rects) {
-		if (hold_dest_rect.y < 600) {
-			allHoldsOffScreen = false;
-			break;
-		}
-	}
-
-	if (allHoldsOffScreen) {
-		SDL_Delay(2000);
+	
+	if (cur_i == 40) {
+		SDL_Delay(1000);
 		g_current_game_phase = PHASE_ENDING1;
 	}
 }
@@ -344,67 +313,57 @@ bool Mode1::checkHold() {
 		prevHold = f_state;
 		return true;
 	}
-	else {
-		showStunEffect = true;
-		prevHold = 0; // hold가 일치하지 않으면 prevHold 값을 초기화합니다.
-	}
+	
 	return false;
 
 }
 
 void Mode1::HandleEvents() {
-	
+
 	SDL_Event event;
 	if (SDL_PollEvent(&event)) {
-		switch (event.type) {                
+		switch (event.type) {
 		case SDL_QUIT:
 			g_flag_running = false;
 			break;
 
 
 		case SDL_KEYDOWN: // 1:down 2:left 3: right 4: up
-			/*
-			if (showStunEffect) {
-				break; // stun 효과가 활성화되어 있으면 다른 키 입력을 무시하고 종료
-			}
-			*/
+			
 
 			if (event.key.keysym.sym == SDLK_LEFT) {
 				// 다음 돌이 leftHold일 때 hold, wall, bg 내려가기 
 				// 아닌경우 stun효과?
 				f_state = 2;
 				// 배경 이미지 이동
-				
-				
+
+
 			}
 			else if (event.key.keysym.sym == SDLK_RIGHT) {
 				// 다음 돌이 rightHold일 때 hold, wall, bg 내려가기
 				// 아닌경우 stun효과?
 				f_state = 3;
 				// 배경 이미지 이동
-				
-				
+
+
 			}
 			else if (event.key.keysym.sym == SDLK_UP) {
 				// 다음 돌이 upHold일 때 hold, wall, bg 내려가기
 				// 아닌경우 stun효과?
 				f_state = 4;
 				// 배경 이미지 이동
-				
-				
+
+
 			}
 			else if (event.key.keysym.sym == SDLK_DOWN) {
 				// 다음 돌이 downHold일 때 hold, wall, bg 내려가기
 				// 아닌경우 stun효과?
 				f_state = 1;
 				// 배경 이미지 이동
-				
-			}
-			if (f_state != hold[cur_i]) {
-				showStunEffect = true;
-				// SDL_Delay(1000);
+
 			}
 			
+
 			break;
 
 		case SDL_KEYUP:
@@ -413,7 +372,7 @@ void Mode1::HandleEvents() {
 				f_state = 0;
 			}
 			break;
-		
+
 		default:
 			break;
 		}
