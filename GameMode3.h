@@ -3,21 +3,27 @@
 #include "SDL.h"
 #include <random>
 
-// 게임 상태
-enum class GameState {
-	Start, // 시작 상태
-	Playing, // 게임 플레이 중 상태
-	GameOver // 게임 오버 상태
-};
+//// 게임 상태
+//enum class GameState {
+//	Start, // 시작 상태
+//	Playing, // 게임 플레이 중 상태
+//	GameOver // 게임 오버 상태
+//};
 
 class Mode3 : public PhaseInterface
 {
 public:
 	Mode3();
 	~Mode3();
+	//bool CheckCollision(int a);
+	//int get_monkeyY_value();
 	virtual void HandleEvents();
 	virtual void Update();
 	virtual void Render();
+
+	
+
+
 
 private:
 	//Tutorial
@@ -70,15 +76,25 @@ private:
 	SDL_Rect source_rectangle_ready;
 	SDL_Rect destination_rectangle_ready;
 
+	// Start
+	SDL_Texture* texture_start;
+	SDL_Rect source_rectangle_start;
+	SDL_Rect destination_rectangle_start;
+
 	bool tutorial;
 	bool ready;
+	bool start;
 	bool game_start;
 	bool game_over;
-	
+	bool game_ending;
+
 	int currentCharacterIndex;
 	bool correct_button;
 
-
-
+	// 원숭이 위치
+	int MONKEY_START_Y = 200;
+	const int monkeySpeed = 3; // 원숭이의 속도, 클라이밍 속도에 따라 조절 가능
+	int monkeyY = MONKEY_START_Y;
+	int velocityY = 0;
 };
 
