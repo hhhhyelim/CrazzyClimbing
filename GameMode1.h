@@ -8,13 +8,15 @@ public:
 	Mode1();
 	~Mode1();
 
-	virtual void HandleEvents();
-	virtual void Update();
-	virtual void Render();
+	virtual void HandleEvents() override;
+	virtual void Update() override;
+	virtual void Render() override;
 	void userMove();
 	void holdMove();
 	bool checkHold();
-
+	void ResetGame();
+	void stun_effect();
 private:
 	int cur_i;
+	int prevHold;
 };
