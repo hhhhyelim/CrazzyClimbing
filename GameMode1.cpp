@@ -68,6 +68,11 @@ SDL_Surface* time_surface;
 SDL_Texture* time_texture;
 SDL_Rect time_rect;
 
+string a;
+TTF_Font* font2;
+SDL_Surface* time2_surface;
+SDL_Texture* time2_texture;
+SDL_Rect time2_rect;
 
 // hold
 vector<string> hold_paths = { "../src/downHold.png", "../src/leftHold.png", "../src/rightHold.png", "../src/upHold.png" };
@@ -127,7 +132,7 @@ Mode1::Mode1() {
 	g_flag_running = true;
 	cur_i = 1;
 	prevHold = 0;
-	startsTime = SDL_GetTicks();
+	
 	// state
 	tutorial = true;
 	ready = false;
@@ -200,6 +205,8 @@ Mode1::Mode1() {
 
 	// time
 	font = TTF_OpenFont("../src/DungGeunMo.ttf", 30);
+
+	
 
 	// hold 이미지 로드
 	srand((unsigned)time(NULL)); // srand는 한 번만 호출해야 합니다.
@@ -288,7 +295,7 @@ Mode1::Mode1() {
 	SDL_FreeSurface(home_surface);
 	SDL_QueryTexture(g_texture_home, NULL, NULL, &g_source_rectangle_home.w, &g_source_rectangle_home.h);
 	g_source_rectangle_home = { 0, 0, 160, 80 };
-	g_destination_rectangle_home = { 210, 485, 160, 80 };
+	g_destination_rectangle_home = { 210, 460, 160, 80 };
 
 	//retry
 	SDL_Surface* retry_surface = IMG_Load("../src/retry.png");
@@ -296,7 +303,10 @@ Mode1::Mode1() {
 	SDL_FreeSurface(retry_surface);
 	SDL_QueryTexture(g_texture_retry, NULL, NULL, &g_source_rectangle_retry.w, &g_source_rectangle_retry.h);
 	g_source_rectangle_retry = { 0, 0, 160, 80 };
-	g_destination_rectangle_retry = { 440, 485, 160, 80 };
+	g_destination_rectangle_retry = { 440, 460, 160, 80 };
+
+	// ending 화면 time
+	font2 = TTF_OpenFont("../src/DungGeunMo.ttf", 42);
 }
 
 Mode1::~Mode1() {
@@ -342,9 +352,9 @@ void Mode1::Update()
 	}
 	else if (start) {
 		if (currentTime - startTime >= 1000) {
-
+			
 			startTime = currentTime;
-
+			
 			tutorial = false;
 			ready = false;
 			start = false;
@@ -354,16 +364,22 @@ void Mode1::Update()
 		}
 	}
 	if (game_start && !game_over) {
-		Uint32 current2Time = SDL_GetTicks();  // 현재 시간 가져오기
-		Uint32 elapsedTime = current2Time - startsTime;  // 경과 시간 계산
-		Uint32 seconds = current2Time / 1000;  // 경과 시간을 초로 변환
+		// 현재 시간 가져오기
+		Uint32 current2Time = SDL_GetTicks();
+		Uint32 elapsed2Time = current2Time - startsTime - 3000;  // 경과 시간 계산 // 3 100
+		Uint32 seconds = elapsed2Time / 1000; // 3
+		Uint32 mseconds = elapsed2Time - seconds*1000;// 경과 시간을 초로 변환 3100 - 3000
 
+	
 		// 시간을 화면에 표시하기 위해 문자열로 변환
-		std::string gameTimeString = "Time:" + std::to_string(seconds) + "s";
+		std::string gameTimeString = std::to_string(seconds) +"." +std::to_string(mseconds);
+			
+		a = gameTimeString;
 
 		// 문자열을 표시할 표면 생성
 		SDL_Color black = { 0, 0, 0, 0 };
 		time_surface = TTF_RenderText_Solid(font, gameTimeString.c_str(), black);
+	
 
 		// 표면을 텍스처로 변환
 		time_texture = SDL_CreateTextureFromSurface(g_renderer, time_surface);
@@ -371,7 +387,7 @@ void Mode1::Update()
 
 		// 텍스처의 크기 및 위치 설정
 		SDL_QueryTexture(time_texture, NULL, NULL, &(time_rect.w), &(time_rect.h));
-		time_rect.x = 50;
+		time_rect.x = 57;
 		time_rect.y = 28;
 
 
@@ -399,6 +415,7 @@ void Mode1::Update()
 	if (game_over) {
 		Uint32 elapsedTime = currentTime - gameoverTime;
 		if (game_over && elapsedTime >= 2000) {
+			startsTime = SDL_GetTicks();
 			tutorial = false;
 			ready = false;
 			start = false;
@@ -428,14 +445,13 @@ void Mode1::Render() {
 	//벽이어지기
 	SDL_Rect wallRect = { 200, wallY, WALL_WIDTH, WALL_HEIGHT };
 	SDL_RenderCopy(g_renderer, wall_texture, NULL, &wallRect);
-
-	SDL_RenderCopy(g_renderer, time_texture, NULL, &time_rect);
+	//SDL_RenderCopy(g_renderer, time_texture, NULL, &time_rect);
 	for (size_t i = 0; i < hold_textures.size(); i++) {
 		SDL_RenderCopy(g_renderer, hold_textures[i], &hold_rects[i], &hold_dest_rects[i]);
 	}
 	SDL_RenderCopy(g_renderer, leftUser_texture, &leftUser_rect, &leftUser_dest_rect);
-	SDL_RenderCopy(g_renderer, timeBg_texture, &timeBg_rect, &timeBg_dest_rect);
-	SDL_RenderCopy(g_renderer, time_texture, NULL, &time_rect);
+	//SDL_RenderCopy(g_renderer, timeBg_texture, &timeBg_rect, &timeBg_dest_rect);
+	//SDL_RenderCopy(g_renderer, time_texture, NULL, &time_rect);
 
 	if (tutorial) {
 		
@@ -450,12 +466,29 @@ void Mode1::Render() {
 	else if (start) {
 		
 		SDL_RenderCopy(g_renderer, start_texture, &start_rect, &start_dest_rect);
+		
 	}
+	else if (game_start || game_over) {
+		SDL_RenderCopy(g_renderer, timeBg_texture, &timeBg_rect, &timeBg_dest_rect);
+		SDL_RenderCopy(g_renderer, time_texture, NULL, &time_rect);
+	}
+
 	else if (game_ending) {
 		SDL_RenderCopy(g_renderer, g_texture_ending, &g_source_rectangle_ending, &g_destination_rectangle_ending);
 		SDL_RenderCopy(g_renderer, g_texture_home, &g_source_rectangle_home, &g_destination_rectangle_home);
 		SDL_RenderCopy(g_renderer, g_texture_retry, &g_source_rectangle_retry, &g_destination_rectangle_retry);
 
+		SDL_Color black = { 0, 0, 0, 0 };
+		time2_surface = TTF_RenderText_Solid(font2, a.c_str(), black);
+		time2_texture = SDL_CreateTextureFromSurface(g_renderer, time2_surface);
+		SDL_FreeSurface(time2_surface);
+		SDL_QueryTexture(time2_texture, NULL, NULL, &(time2_rect.w), &(time2_rect.h));
+		time2_rect.x = 543;
+		time2_rect.y = 283;
+		
+		SDL_RenderCopy(g_renderer, time2_texture, NULL, &time2_rect);
+
+		
 	}
 
 	SDL_RenderPresent(g_renderer);
@@ -532,6 +565,7 @@ void Mode1::HandleEvents() {
 					mouse_y >= introBack_dest_rect.y &&
 					mouse_y <= introBack_dest_rect.y + introBack_dest_rect.h) {
 					//g_current_game_phase = PHASE_HOME;
+					//ResetGame();
 					tutorial = true;
 					ready = false;
 					start = false;
@@ -552,6 +586,7 @@ void Mode1::HandleEvents() {
 					game_over = false;
 					game_ending = false;
 					startTime = SDL_GetTicks();
+					startsTime = SDL_GetTicks();
 				}
 
 				// home 버튼
@@ -560,7 +595,9 @@ void Mode1::HandleEvents() {
 					mouse_y >= g_destination_rectangle_home.y &&
 					mouse_y <= g_destination_rectangle_home.y + g_destination_rectangle_home.h)
 				{
+
 					//g_current_game_phase = PHASE_HOME;
+					ResetGame();
 					tutorial = true;
 					ready = false;
 					start = false;
