@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "SDL.h"
 
@@ -20,7 +20,7 @@ public:
 private:
 
 
-	// ¹è°æ ÀÌ¹ÌÁö Å©±â
+	// ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ Å©ï¿½ï¿½
 	const int BACKGROUND_WIDTH = 800;
 	const int BACKGROUND_HEIGHT = 1800;
 
@@ -28,12 +28,12 @@ private:
 	const int WALL_HEIGHT = 5400;
 
 
-	//ÀÎÆ®·Î (tuto)
+	//ï¿½ï¿½Æ®ï¿½ï¿½ (tuto)
 	SDL_Texture* g_texture_intro;
 	SDL_Rect g_source_rectangle_intro;
 	SDL_Rect g_destination_rectangle_intro;
 
-	//ÇÃ·¹ÀÌ¹öÆ°
+	//ï¿½Ã·ï¿½ï¿½Ì¹ï¿½Æ°
 	SDL_Texture* g_texture_play;
 	SDL_Rect g_source_rectangle_play;
 	SDL_Rect g_destination_rectangle_play;
@@ -61,7 +61,7 @@ private:
 	SDL_Texture* bg_texture;
 	SDL_Rect bg_rect;
 	SDL_Rect bg_dest_rect;
-	int backgroundY; // ¹è°æ ÀÌ¹ÌÁöÀÇ Y ÁÂÇ¥
+	int backgroundY; // ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ï¿½ï¿½ Y ï¿½ï¿½Ç¥
 
 	// wall
 	SDL_Surface* wall_surface;
@@ -82,13 +82,13 @@ private:
 	SDL_Texture* time_texture;
 	SDL_Rect time_rect;
 
-	
+
 	TTF_Font* font2;
 	SDL_Surface* time2_surface;
 	SDL_Texture* time2_texture;
 	SDL_Rect time2_rect;
 
-	int leftHoldY = 475; //¿ø·¡ 150 Â÷ÀÌ¿©¼­ 75 Â÷ÀÌ ÇöÀç´Â 200 Â÷ÀÌ´Ï±î 100Â÷ÀÌ³ª°Ô
+	int leftHoldY = 475; //ï¿½ï¿½ï¿½ï¿½ 150 ï¿½ï¿½ï¿½Ì¿ï¿½ï¿½ï¿½ 75 ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ 200 ï¿½ï¿½ï¿½Ì´Ï±ï¿½ 100ï¿½ï¿½ï¿½Ì³ï¿½ï¿½ï¿½
 	int rightHoldY = 375;
 
 	// leftUser
@@ -103,7 +103,7 @@ private:
 	SDL_Rect rightUser_rect;
 	SDL_Rect rightUser_dest_rect;
 
-	// stun È¿°ú
+	// stun È¿ï¿½ï¿½
 	SDL_Surface* stun_surface;
 	SDL_Texture* stun_texture;
 	SDL_Rect stun_rect;
@@ -128,7 +128,7 @@ private:
 	int hold[41]; // 1:down 2:left 3: right 4: up
 	int f_state; // 1:down 2:left 3: right 4: up
 	bool isLeftUser = true;
-	
+
 	int prevHoldIndex = -1;
 
 	Uint32 startTime = 0;

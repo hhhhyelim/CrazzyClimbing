@@ -1,21 +1,22 @@
 #include "Game.h"
 #include "GameIntro.h"
 
-// ê²Œì„ ì°½ í¬ê¸°
+// °ÔÀÓ Ã¢ Å©±â
 const int WINDOW_WIDTH = 800;
 const int WINDOW_HEIGHT = 600;
 
-// ë°°ê²½ ì´ë¯¸ì§€ í¬ê¸°
+// ¹è°æ ÀÌ¹ÌÁö Å©±â
 const int BACKGROUND_WIDTH = 800;
 const int BACKGROUND_HEIGHT = 1800;
 
-SDL_Texture* backgroundTexture; // ë°°ê²½ ì´ë¯¸ì§€ í…ìŠ¤ì²˜
-int backgroundY; // ë°°ê²½ ì´ë¯¸ì§€ì˜ Y ì¢Œí‘œ
+SDL_Texture* backgroundTexture; // ¹è°æ ÀÌ¹ÌÁö ÅØ½ºÃ³
+int backgroundY; // ¹è°æ ÀÌ¹ÌÁöÀÇ Y ÁÂÇ¥
 
 
 Intro::Intro() {
 
-	// BackGround
+
+	// Title
 	SDL_Surface* bg_surface = IMG_Load("../../Resources/Main_Title.png");
 	g_bg_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface);
 	SDL_FreeSurface(bg_surface);
@@ -30,14 +31,14 @@ Intro::Intro() {
 	g_bg_destination_rect.w = 650;
 	g_bg_destination_rect.h = 450;
 
-	// ë°°ê²½ ì´ë¯¸ì§€ ë¡œë“œ
+	// ¹è°æ ÀÌ¹ÌÁö ·Îµå
 	{
 		SDL_Surface* surface = IMG_Load("../../Resources/Mode1_bg.png");
 		backgroundTexture = SDL_CreateTextureFromSurface(g_renderer, surface);
 		SDL_FreeSurface(surface);
 	}
 
-	// ë°°ê²½ ì´ë¯¸ì§€ ì´ˆê¸° ìœ„ì¹˜ ì„¤ì • (í™”ë©´ ì•„ë˜ë¡œ)
+	// ¹è°æ ÀÌ¹ÌÁö ÃÊ±â À§Ä¡ ¼³Á¤ (È­¸é ¾Æ·¡·Î)
 	backgroundY = 0;
 
 
@@ -66,10 +67,15 @@ Intro::~Intro() {
 
 void Intro::Update()
 {
-	// ë°°ê²½ ì´ë¯¸ì§€ ì´ë™
-	backgroundY -= 7; // ì›í•˜ëŠ” ì†ë„ë¡œ ì¡°ì •
+	// ¹è°æ ÀÌ¹ÌÁö ÀÌµ¿
+	//if (c = true) {
+	//	backgroundY -= 7; // ¿øÇÏ´Â ¼Óµµ·Î Á¶Á¤
+	//	c = false;
+	//}
+	
+	backgroundY -= 7;
 
-	// ë°°ê²½ ì´ë¯¸ì§€ê°€ í™”ë©´ ìœ„ë¡œ ë²—ì–´ë‚˜ê¸° ì „ê¹Œì§€ ê³„ì† ì´ë™
+	// ¹è°æ ÀÌ¹ÌÁö°¡ È­¸é À§·Î ¹ş¾î³ª±â Àü±îÁö °è¼Ó ÀÌµ¿
 	if (backgroundY <= -BACKGROUND_HEIGHT + WINDOW_HEIGHT) {
 		backgroundY = -BACKGROUND_HEIGHT + WINDOW_HEIGHT;
 	}
@@ -77,7 +83,7 @@ void Intro::Update()
 
 void Intro::Render() {
 	
-	// ë°°ê²½ ì´ë¯¸ì§€ ê·¸ë¦¬ê¸°
+	// ¹è°æ ÀÌ¹ÌÁö ±×¸®±â
 	SDL_Rect backgroundRect = { 0, backgroundY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT };
 	SDL_RenderCopy(g_renderer, backgroundTexture, NULL, &backgroundRect);
 
@@ -86,7 +92,7 @@ void Intro::Render() {
 
 	// Start Button
 	SDL_RenderCopy(g_renderer, texture_, &source_rectangle_, &destination_rectangle_);
-	
+	 
 	SDL_RenderPresent(g_renderer);
 
 }
@@ -112,7 +118,7 @@ void Intro::HandleEvents() {
 				if (mouseX >= destination_rectangle_.x && mouseX < destination_rectangle_.x + destination_rectangle_.w
 					&& mouseY >= destination_rectangle_.y && mouseY < destination_rectangle_.y + destination_rectangle_.h) {
 					g_current_game_phase = PHASE_HOME;
-
+					
 				}
 
 			}

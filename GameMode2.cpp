@@ -1,4 +1,4 @@
-//GameMode2.cpp
+ï»¿//GameMode2.cpp
 #include "Game.h"
 #include "GameMode2.h"
 #include <vector>
@@ -27,7 +27,7 @@ Mode2::Mode2() {
 	game_over = false;
 	game_ending = false;
 
-	//ÀÎÆ®·Î Æ©Åä¸®¾ó
+	//ï¿½ï¿½Æ®ï¿½ï¿½ Æ©ï¿½ä¸®ï¿½ï¿½
 	SDL_Surface* intro_surface = IMG_Load("../../Resources/m2/intro.png");
 	g_texture_intro = SDL_CreateTextureFromSurface(g_renderer, intro_surface);
 	SDL_FreeSurface(intro_surface);
@@ -35,7 +35,7 @@ Mode2::Mode2() {
 	g_source_rectangle_intro = { 0, 0, 800, 600 };
 	g_destination_rectangle_intro = { 95, 40, 620, 480 };
 
-	//play¹öÆ°
+	//playï¿½ï¿½Æ°
 	SDL_Surface* play_surface = IMG_Load("../../Resources/m2/play.png");
 	g_texture_play = SDL_CreateTextureFromSurface(g_renderer, play_surface);
 	SDL_FreeSurface(play_surface);
@@ -43,50 +43,50 @@ Mode2::Mode2() {
 	g_source_rectangle_play = { 0, 0, 160, 80 };
 	g_destination_rectangle_play = { 320, 510, 160, 80 };
 
-	//µÚ·Î°¡±â
+	//ï¿½Ú·Î°ï¿½ï¿½ï¿½
 	introBack_surface = IMG_Load("../../Resources/m2/back.png");
 	introBack_texture = SDL_CreateTextureFromSurface(g_renderer, introBack_surface);
 	SDL_FreeSurface(introBack_surface);
 	introBack_rect = { 0, 0, introBack_surface->w,introBack_surface->h };
 	introBack_dest_rect = { 10, 10, introBack_surface->w, introBack_surface->h };
 
-	//·¹µð
+	//ï¿½ï¿½ï¿½ï¿½
 	ready_surface = IMG_Load("../../Resources/m2/ready.png");
 	ready_texture = SDL_CreateTextureFromSurface(g_renderer, ready_surface);
 	SDL_FreeSurface(ready_surface);
 	ready_rect = { 0, 0, ready_surface->w,ready_surface->h };
 	ready_dest_rect = { 10, 10, ready_surface->w, ready_surface->h };
 
-	//½ºÅ¸Æ®
+	//ï¿½ï¿½Å¸Æ®
 	start_surface = IMG_Load("../../Resources/m2/start.png");
 	start_texture = SDL_CreateTextureFromSurface(g_renderer, start_surface);
 	SDL_FreeSurface(start_surface);
 	start_rect = { 0, 0, start_surface->w,start_surface->h };
 	start_dest_rect = { 10, 10, start_surface->w, start_surface->h };
 
-	// ¹è°æ ÀÌ¹ÌÁö ·Îµå
+	// ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½Îµï¿½
 	bg_surface = IMG_Load("../../Resources/m2/bg_mode2.png");
-	bg_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface); // GPU·Î ¿Å±â±â 
+	bg_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface); // GPUï¿½ï¿½ ï¿½Å±ï¿½ï¿½ 
 	SDL_FreeSurface(bg_surface);
-	backgroundY = -2400; 	// ¹è°æ ÀÌ¹ÌÁö ÃÊ±â À§Ä¡ ¼³Á¤ (È­¸é À§·Î)
+	backgroundY = -2400; 	// ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ (È­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
 
-	// wall ÀÌ¹ÌÁö ·Îµå
+	// wall ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½Îµï¿½
 	wall_surface = IMG_Load("../../Resources/m2/wall_mode2.png");
-	wall_texture = SDL_CreateTextureFromSurface(g_renderer, wall_surface); // GPU·Î ¿Å±â±â 
+	wall_texture = SDL_CreateTextureFromSurface(g_renderer, wall_surface); // GPUï¿½ï¿½ ï¿½Å±ï¿½ï¿½ 
 	SDL_FreeSurface(wall_surface);
 	wall_rect = { 0, 0, 400, 600 };
 	wall_dest_rect = { 200, 0, 400, 600 };
 
-	
 
-	//È¦µå ÀÌ¹ÌÁö ·Îµå
-	srand((unsigned)time(NULL)); // srand´Â ÇÑ ¹ø¸¸ È£ÃâÇØ¾ß ÇÕ´Ï´Ù.
+
+	//È¦ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½Îµï¿½
+	srand((unsigned)time(NULL)); // srandï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½ï¿½Ø¾ï¿½ ï¿½Õ´Ï´ï¿½.
 	for (int i = 0; i < 500; i++) {
 		int random_hold_idx;
 		do {
-			random_hold_idx = rand() % 3; // 0~3 Áß ÇÏ³ªÀÇ ÀÎµ¦½º¸¦ ¹«ÀÛÀ§·Î ¼±ÅÃ
-		} while (random_hold_idx == prevHoldIndex); // ÇöÀç ÀÎµ¦½º°¡ ÀÌÀü ÀÎµ¦½º¿Í °°À¸¸é »õ·Î¿î ÀÎµ¦½º¸¦ °è¼Ó »ý¼ºÇÕ´Ï´Ù
-		
+			random_hold_idx = rand() % 3; // 0~3 ï¿½ï¿½ ï¿½Ï³ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+		} while (random_hold_idx == prevHoldIndex); // ï¿½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Î¿ï¿½ ï¿½Îµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½
+
 		prevHoldIndex = random_hold_idx;
 		string hold_path = hold2_paths[random_hold_idx];
 		SDL_Surface* hold_surface = IMG_Load(hold_path.c_str());
@@ -137,7 +137,7 @@ Mode2::Mode2() {
 	rightUser_dest_rect = { 410, 427, rightUser_surface->w, rightUser_surface->h };
 
 	//ENDING
-	//¿£µù»çÁø
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	SDL_Surface* ending_surface = IMG_Load("../../Resources/m2/bg_mode2_ending.png");
 	g_texture_ending = SDL_CreateTextureFromSurface(g_renderer, ending_surface);
 	SDL_FreeSurface(ending_surface);
@@ -145,7 +145,7 @@ Mode2::Mode2() {
 	g_source_rectangle_ending = { 0, 0, 800, 600 };
 	g_destination_rectangle_ending = { 0, 0, 800, 600 };
 
-	//home ¹öÆ°
+	//home ï¿½ï¿½Æ°
 	SDL_Surface* home_surface = IMG_Load("../../Resources/m2/home_btn.png");
 	g_texture_home = SDL_CreateTextureFromSurface(g_renderer, home_surface);
 	SDL_FreeSurface(home_surface);
@@ -188,7 +188,7 @@ void Mode2::Update()
 {
 	Uint32 currentTime = SDL_GetTicks();
 
-	//·¹µð
+	//ï¿½ï¿½ï¿½ï¿½
 	if (ready) {
 		if (currentTime - startTime >= 2000) {
 			startTime = currentTime;
@@ -201,7 +201,7 @@ void Mode2::Update()
 			game_ending = false;
 		}
 	}
-	//½ºÅ¸Æ®
+	//ï¿½ï¿½Å¸Æ®
 	else if (start) {
 		if (currentTime - startTime >= 1000) {
 
@@ -217,7 +217,7 @@ void Mode2::Update()
 	}
 
 	if (game_start && !game_over) {
-		//¸Â´Âµ¹ ´­·¶À» ¶§
+		//ï¿½Â´Âµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
 		if (checkHold()) {
 			userMove();
 			holdMove();
@@ -226,7 +226,7 @@ void Mode2::Update()
 			backgroundY += 30;
 			holdCount++;
 
-			if (cur_i >= 50) { //È¦µå 50°³ ³ÑÀ¸¸é ½ºÇÇµå ¾÷!
+			if (cur_i >= 50) { //È¦ï¿½ï¿½ 50ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Çµï¿½ ï¿½ï¿½!
 				gaugeDecreaseRate = gaugeDecreaseRate2;
 			}
 		}
@@ -236,7 +236,7 @@ void Mode2::Update()
 				gauge = 0;
 			}
 		}
-		// °ÔÀÌÁö°¡ 0ÀÌ¸é °ÔÀÓ ¿À¹ö
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 0ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 		if (gauge == 0) {
 			tutorial = false;
 			ready = false;
@@ -244,7 +244,7 @@ void Mode2::Update()
 			game_start = false;
 			game_over = true;
 			game_ending = false;
-			
+
 		}
 
 		if (checkHold()) {
@@ -273,13 +273,13 @@ void Mode2::Update()
 		game_start = false;
 		game_over = false;
 
-		// ½Ã°£À» È­¸é¿¡ Ç¥½ÃÇÏ±â À§ÇØ ¹®ÀÚ¿­·Î º¯È¯
+		// ï¿½Ã°ï¿½ï¿½ï¿½ È­ï¿½é¿¡ Ç¥ï¿½ï¿½ï¿½Ï±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½ ï¿½ï¿½È¯
 		std::string gameTimeString = std::to_string(holdCount);
 
 		SDL_Color black = { 0, 0, 0, 0 };
 		num_surface = TTF_RenderText_Blended(font, gameTimeString.c_str(), black);
 
-		// Ç¥¸éÀ» ÅØ½ºÃ³·Î º¯È¯
+		// Ç¥ï¿½ï¿½ï¿½ï¿½ ï¿½Ø½ï¿½Ã³ï¿½ï¿½ ï¿½ï¿½È¯
 		num_texture = SDL_CreateTextureFromSurface(g_renderer, num_surface);
 		SDL_FreeSurface(num_surface);
 
@@ -292,11 +292,11 @@ void Mode2::Update()
 void Mode2::Render() {
 	SDL_RenderClear(g_renderer);
 
-	//¹è°æÀÌ¾îÁö±â
+	//ï¿½ï¿½ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ï¿½ï¿½
 	SDL_Rect backgroundRect = { 0, backgroundY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT };
 	SDL_RenderCopy(g_renderer, bg_texture, NULL, &backgroundRect);
-	
-	//º®ÀÌ¾îÁö±â
+
+	//ï¿½ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ï¿½ï¿½
 	{
 		int currentY = wall_dest_rect.y + wall_dest_rect.h;
 		while (currentY > -wall_rect.h) {
@@ -309,81 +309,81 @@ void Mode2::Render() {
 			currentY -= wall_rect.h;
 		}
 	}
-		// °ÔÀÌÁö ±×¸®±â
-		SDL_Rect gaugeRect = { 615, 20, gauge, 30 }; // °ÔÀÌÁö À§Ä¡¿Í Å©±â ¼³Á¤
-		SDL_SetRenderDrawColor(g_renderer, 255, 0, 0, 255); // °ÔÀÌÁö »ö»ó (»¡°£»ö)
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½
+	SDL_Rect gaugeRect = { 615, 20, gauge, 30 }; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	SDL_SetRenderDrawColor(g_renderer, 255, 0, 0, 255); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
+	SDL_RenderFillRect(g_renderer, &gaugeRect);
+
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×µÎ¸ï¿½ ï¿½×¸ï¿½ï¿½ï¿½
+	SDL_Rect gaugeBorderRect = { 615, 20, 150, 30 }; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×µÎ¸ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	SDL_SetRenderDrawColor(g_renderer, 255, 255, 255, 255); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×µÎ¸ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½)
+	int borderWidth = 4; // ï¿½×µÎ¸ï¿½ ï¿½Î²ï¿½ ï¿½ï¿½ï¿½ï¿½
+	for (int i = 0; i < borderWidth; i++) {
+		SDL_Rect borderRect = { gaugeBorderRect.x - i, gaugeBorderRect.y - i, gaugeBorderRect.w + 2 * i, gaugeBorderRect.h + 2 * i };
+		SDL_RenderDrawRect(g_renderer, &borderRect);
+	}
+
+	if (tutorial) {
+		//Tutorial
+		SDL_RenderCopy(g_renderer, g_texture_intro, &g_source_rectangle_intro, &g_destination_rectangle_intro);
+		// Play Button
+		SDL_RenderCopy(g_renderer, g_texture_play, &g_source_rectangle_play, &g_destination_rectangle_play);
+		// Back Button
+		SDL_RenderCopy(g_renderer, introBack_texture, &introBack_rect, &introBack_dest_rect);
+	}
+
+	else if (ready) {
+		SDL_RenderCopy(g_renderer, ready_texture, &ready_rect, &ready_dest_rect);
+	}
+
+	else if (start) {
+		SDL_RenderCopy(g_renderer, start_texture, &start_rect, &start_dest_rect);
+	}
+
+	else if (game_start) {
+		SDL_Rect gaugeRect = { 615, 20, gauge, 30 }; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+		SDL_SetRenderDrawColor(g_renderer, 255, 0, 0, 255); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
 		SDL_RenderFillRect(g_renderer, &gaugeRect);
 
-		// °ÔÀÌÁö Å×µÎ¸® ±×¸®±â
-		SDL_Rect gaugeBorderRect = { 615, 20, 150, 30 }; // °ÔÀÌÁö Å×µÎ¸® À§Ä¡¿Í Å©±â ¼³Á¤
-		SDL_SetRenderDrawColor(g_renderer, 255, 255, 255, 255); // °ÔÀÌÁö Å×µÎ¸® »ö»ó (Èò»ö)
-		int borderWidth = 4; // Å×µÎ¸® µÎ²² ¼³Á¤
+		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×µÎ¸ï¿½ ï¿½×¸ï¿½ï¿½ï¿½
+		SDL_Rect gaugeBorderRect = { 615, 20, 150, 30 }; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×µÎ¸ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+		SDL_SetRenderDrawColor(g_renderer, 255, 255, 255, 255); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×µÎ¸ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½)
+		int borderWidth = 4; // ï¿½×µÎ¸ï¿½ ï¿½Î²ï¿½ ï¿½ï¿½ï¿½ï¿½
 		for (int i = 0; i < borderWidth; i++) {
 			SDL_Rect borderRect = { gaugeBorderRect.x - i, gaugeBorderRect.y - i, gaugeBorderRect.w + 2 * i, gaugeBorderRect.h + 2 * i };
 			SDL_RenderDrawRect(g_renderer, &borderRect);
 		}
 
-		if (tutorial) {
-			//Tutorial
-			SDL_RenderCopy(g_renderer, g_texture_intro, &g_source_rectangle_intro, &g_destination_rectangle_intro);
-			// Play Button
-			SDL_RenderCopy(g_renderer, g_texture_play, &g_source_rectangle_play, &g_destination_rectangle_play);
-			// Back Button
-			SDL_RenderCopy(g_renderer, introBack_texture, &introBack_rect, &introBack_dest_rect);	
+		//È¦ï¿½ï¿½×¸ï¿½ï¿½ï¿½
+		for (size_t i = 0; i < hold2_textures.size(); i++) {
+			SDL_RenderCopy(g_renderer, hold2_textures[i], &hold2_rects[i], &hold2_dest_rects[i]);
 		}
 
-		else if (ready) {
-			SDL_RenderCopy(g_renderer, ready_texture, &ready_rect, &ready_dest_rect);
-		}
-
-		else if (start) {
-			SDL_RenderCopy(g_renderer, start_texture, &start_rect, &start_dest_rect);
-		}
-
-		else if (game_start) {
-			SDL_Rect gaugeRect = { 615, 20, gauge, 30 }; // °ÔÀÌÁö À§Ä¡¿Í Å©±â ¼³Á¤
-			SDL_SetRenderDrawColor(g_renderer, 255, 0, 0, 255); // °ÔÀÌÁö »ö»ó (»¡°£»ö)
-			SDL_RenderFillRect(g_renderer, &gaugeRect);
-
-			// °ÔÀÌÁö Å×µÎ¸® ±×¸®±â
-			SDL_Rect gaugeBorderRect = { 615, 20, 150, 30 }; // °ÔÀÌÁö Å×µÎ¸® À§Ä¡¿Í Å©±â ¼³Á¤
-			SDL_SetRenderDrawColor(g_renderer, 255, 255, 255, 255); // °ÔÀÌÁö Å×µÎ¸® »ö»ó (Èò»ö)
-			int borderWidth = 4; // Å×µÎ¸® µÎ²² ¼³Á¤
-			for (int i = 0; i < borderWidth; i++) {
-				SDL_Rect borderRect = { gaugeBorderRect.x - i, gaugeBorderRect.y - i, gaugeBorderRect.w + 2 * i, gaugeBorderRect.h + 2 * i };
-				SDL_RenderDrawRect(g_renderer, &borderRect);
-			}
-
-			//È¦µå±×¸®±â
-			for (size_t i = 0; i < hold2_textures.size(); i++) {
-				SDL_RenderCopy(g_renderer, hold2_textures[i], &hold2_rects[i], &hold2_dest_rects[i]);
-			}
-
-			//»ç¶÷
-			SDL_RenderCopy(g_renderer, leftUser_texture, &leftUser_rect, &leftUser_dest_rect);
-		}
-		else if (game_ending) {
-			SDL_RenderCopy(g_renderer, g_texture_ending, &g_source_rectangle_ending, &g_destination_rectangle_ending);
-			SDL_RenderCopy(g_renderer, g_texture_home, &g_source_rectangle_home, &g_destination_rectangle_home);
-			SDL_RenderCopy(g_renderer, g_texture_retry, &g_source_rectangle_retry, &g_destination_rectangle_retry);
-
-			// È¦µå °³¼ö Ãâ·Â
-			SDL_RenderCopy(g_renderer, num_texture, NULL, &num_rect);
-		}
-		SDL_RenderPresent(g_renderer);
+		//ï¿½ï¿½ï¿½
+		SDL_RenderCopy(g_renderer, leftUser_texture, &leftUser_rect, &leftUser_dest_rect);
 	}
+	else if (game_ending) {
+		SDL_RenderCopy(g_renderer, g_texture_ending, &g_source_rectangle_ending, &g_destination_rectangle_ending);
+		SDL_RenderCopy(g_renderer, g_texture_home, &g_source_rectangle_home, &g_destination_rectangle_home);
+		SDL_RenderCopy(g_renderer, g_texture_retry, &g_source_rectangle_retry, &g_destination_rectangle_retry);
+
+		// È¦ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+		SDL_RenderCopy(g_renderer, num_texture, NULL, &num_rect);
+	}
+	SDL_RenderPresent(g_renderer);
+}
 
 
 void Mode2::userMove() {
-	//¹è°æ ¾Æ·¡·Î ¿òÁ÷ÀÌ±â
+	//ï¿½ï¿½ï¿½ ï¿½Æ·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ì±ï¿½
 	wall_dest_rect.y += 20;
 
-	//¿ÞÂÊÀ¯ÀúÀÏ¶§ ¿À¸¥ÂÊÀ¯Àú·Î ¹Ù²Ù±â
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù²Ù±ï¿½
 	if (isLeftUser) {
 		leftUser_dest_rect.x += 150;
 		rightUser_dest_rect.x -= 150;
 	}
-	//¿À¸¥ÂÊÀ¯ÀúÀÏ¶§ ¿ÞÂÊÀ¯Àú·Î ¹Ù²Ù±â
+	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù²Ù±ï¿½
 	else {
 		leftUser_dest_rect.x -= 150;
 		rightUser_dest_rect.x += 150;
@@ -412,7 +412,7 @@ bool Mode2::checkHold() {
 		return true;
 	}
 	else {
-		prevHold = 0; // hold°¡ ÀÏÄ¡ÇÏÁö ¾ÊÀ¸¸é prevHold °ªÀ» ÃÊ±âÈ­ÇÕ´Ï´Ù.
+		prevHold = 0; // holdï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ prevHold ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­ï¿½Õ´Ï´ï¿½.
 	}
 	return false;
 }
@@ -433,10 +433,11 @@ void Mode2::HandleEvents() {
 			{
 				int mouseX = event.button.x;
 				int mouseY = event.button.y;
-				//µÚ·Î°¡±â(homeÀ¸·Î) ³ªÁß¿¡ ÇÕÄ¡¸é!!!!!
+				//ï¿½Ú·Î°ï¿½ï¿½ï¿½(homeï¿½ï¿½ï¿½ï¿½) ï¿½ï¿½ï¿½ß¿ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½!!!!!
 				if (mouseX >= introBack_rect.x && mouseX < introBack_dest_rect.x + introBack_dest_rect.w
 					&& mouseY >= introBack_dest_rect.y && mouseY < introBack_dest_rect.y + introBack_dest_rect.h
 					&& g_current_game_phase == PHASE_MODE2) {
+					g_current_game_phase = PHASE_HOME;
 					tutorial = true;
 					ready = false;
 					start = false;
@@ -472,12 +473,12 @@ void Mode2::HandleEvents() {
 					ResetGame();
 				}
 
-				// home ¹öÆ°
+				// home ï¿½ï¿½Æ°
 				if (mouseX >= g_destination_rectangle_home.x &&
 					mouseX <= g_destination_rectangle_home.x + g_destination_rectangle_home.w &&
 					mouseY >= g_destination_rectangle_home.y &&
 					mouseY <= g_destination_rectangle_home.y + g_destination_rectangle_home.h) {
-					// g_current_game_phase = HOME;
+					g_current_game_phase = PHASE_HOME;
 					tutorial = true;
 					ready = false;
 					start = false;
@@ -487,7 +488,7 @@ void Mode2::HandleEvents() {
 					ResetGame();
 				}
 			}
-				break;
+			break;
 
 		case SDL_KEYDOWN:
 			if (!tutorial && !ready && !start && event.key.keysym.sym)
@@ -501,21 +502,21 @@ void Mode2::HandleEvents() {
 				}
 				else if (event.key.keysym.sym == SDLK_g) {
 					f_state = 2;
-					gauge += 10; // ¹öÆ°À» ´©¸¦ ¶§ °ÔÀÌÁö¸¦ Áõ°¡½ÃÅ´
+					gauge += 10; // ï¿½ï¿½Æ°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å´
 					if (gauge > 100) {
 						gauge = 100;
 					}
 				}
 				else if (event.key.keysym.sym == SDLK_b) {
 					f_state = 3;
-					gauge += 10; // ¹öÆ°À» ´©¸¦ ¶§ °ÔÀÌÁö¸¦ Áõ°¡½ÃÅ´
+					gauge += 10; // ï¿½ï¿½Æ°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å´
 					if (gauge > 100) {
 						gauge = 100;
 					}
 				}
-				//Æ²·ÈÀ»¶§ °ÔÀÓ¿À¹ö
+				//Æ²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ó¿ï¿½ï¿½ï¿½
 				if (f_state != hold[cur_i]) {
-					SDL_Delay(2000); //¸Â´Â È¿°úÀ½ ³ÖÀ¸¸é ¤¡¤ºÀ»µí!!
+					SDL_Delay(2000); //ï¿½Â´ï¿½ È¿ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!!
 					tutorial = false;
 					ready = false;
 					start = false;
@@ -527,45 +528,45 @@ void Mode2::HandleEvents() {
 
 		case SDL_KEYUP:
 			if (event.key.keysym.sym == SDLK_DOWN) {
-				// ¾Æ·¡ Å°¸¦ ¶¼¸é f_state °ªÀ» ÃÊ±âÈ­ÇÕ´Ï´Ù.
+				// ï¿½Æ·ï¿½ Å°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ f_state ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­ï¿½Õ´Ï´ï¿½.
 				f_state = 0;
 			}
 			}
 			break;
 		default:
 			break;
-			}
+		}
+	}
+}
+
+void Mode2::ResetGame() {
+	f_state = 0;
+	cur_i = 1;
+	prevHold = 0;
+	gauge = 150;
+	holdCount = 0;
+
+	backgroundY = -2400;
+
+	userMove();
+	//isLeftUser = !isLeftUser;
+	leftUser_dest_rect.x = 280;
+	rightUser_dest_rect.x = 410;
+	//leftUser_dest_rect = { 280, 427, leftUser_surface->w, leftUser_surface->h };
+	//rightUser_dest_rect = { 410, 427, rightUser_surface->w, rightUser_surface->h };
+
+	// Reset hold positions
+	leftHoldY = 475;
+	rightHoldY = 375;
+	for (size_t i = 0; i < hold2_dest_rects.size(); i++) {
+		if (i % 2 == 0) {
+			hold2_dest_rects[i].y = leftHoldY;
+			leftHoldY -= 200;
+		}
+		else {
+			hold2_dest_rects[i].y = rightHoldY;
+			rightHoldY -= 200;
 		}
 	}
 
-	void Mode2::ResetGame() {
-		f_state = 0;
-		cur_i = 1;
-		prevHold = 0;
-		gauge = 150;
-		holdCount = 0;
-
-		backgroundY = -2400;
-
-		userMove();
-		//isLeftUser = !isLeftUser;
-		leftUser_dest_rect.x = 280;
-		rightUser_dest_rect.x = 410;
-		//leftUser_dest_rect = { 280, 427, leftUser_surface->w, leftUser_surface->h };
-		//rightUser_dest_rect = { 410, 427, rightUser_surface->w, rightUser_surface->h };
-
-		// Reset hold positions
-		leftHoldY = 475;
-		rightHoldY = 375;
-		for (size_t i = 0; i < hold2_dest_rects.size(); i++) {
-			if (i % 2 == 0) {
-				hold2_dest_rects[i].y = leftHoldY;
-				leftHoldY -= 200;
-			}
-			else {
-				hold2_dest_rects[i].y = rightHoldY;
-				rightHoldY -= 200;
-			}
-		}
-
-	}
+}

@@ -3,56 +3,12 @@
 #include <vector>
 
 
-
-
-// ëŒ í¬ê¸°
-const int STONE_WIDTH = 64;
-const int STONE_HEIGHT = 64;
-
-// ëŒ ì´ë¯¸ì§€ ì¶œë ¥ ê°œìˆ˜
-const int NUM_STONES = 5;
-
-int currentCharacterIndex; // í˜„ì¬ ìºë¦­í„° ì¸ë±ìŠ¤
-
-// ëŒ ì´ë¯¸ì§€ ìœ„ì¹˜
-const int STONE_X = 370; // ëŒì˜ X ì¢Œí‘œ
-const int STONE_Y = 350; // ëŒì˜ Y ì¢Œí‘œ
-const int STONE_SPACING = 110; // ëŒ ì‚¬ì´ì˜ ê°„ê²©
-Uint32 startTime = 0;
-Uint32 gameoverTime = 0;
-
-
-// ëœë¤ ìˆ«ì ìƒì„±ê¸° ì´ˆê¸°í™”
+// ·£´ı ¼ıÀÚ »ı¼º±â ÃÊ±âÈ­
 std::default_random_engine randomEngine(static_cast<unsigned int>(time(0)));
 std::uniform_int_distribution<int> randomDistribution(1, 4);
 
-// í˜„ì¬ ëŒì˜ ìˆ«ì
-int currentNumber = randomDistribution(randomEngine); // ëœë¤ ê°’ìœ¼ë¡œ ì´ˆê¸°í™”
-
-// ì´ë¯¸ì§€ í…ìŠ¤ì²˜ ë¡œë“œ
-SDL_Texture* stoneTextures[4];
-
-std::vector<int> stoneNumbers; // ìˆ«ì ì €ì¥ìš© ë°°ì—´
-int stonesOnScreen; // í™”ë©´ì— ì¶œë ¥ë˜ëŠ” ëŒì˜ ê°œìˆ˜
-
-bool correct_button;
-
-
-
-
-// í”Œë ˆì´ì–´ê°€ ëŒì„ ëˆ„ë¥¸ ì‹œê°„ ê¸°ë¡
-Uint32 lastStonePressTime = 0;
-
-
-SDL_Texture* chTextures[2];
-SDL_Rect chRect;
-
-
-SDL_Texture* monkeyTextures[3];
-SDL_Rect monkeyRect;
-int monkeyFrame = 0;
-int monkeyTimer = 0;
-
+// ÇöÀç µ¹ÀÇ ¼ıÀÚ
+int currentNumber = randomDistribution(randomEngine); // ·£´ı °ªÀ¸·Î ÃÊ±âÈ­
 
 
 Mode3::Mode3() {
@@ -66,17 +22,17 @@ Mode3::Mode3() {
     game_over = false;
     game_ending = false;
 
-    //result 1 = ê²Œì„ì˜¤ë²„/ result 1 = finish
+    //result 1 = °ÔÀÓ¿À¹ö/ result 1 = finish
     result = 0;
 
     correct_button = false;
 
 
-    // ì›ìˆ­ì´ ì´ë¯¸ì§€ ë¡œë“œ
+    // ¿ø¼şÀÌ ÀÌ¹ÌÁö ·Îµå
     SDL_Surface* monkeySurface;
     for (int i = 0; i < 3; ++i)
     {
-        std::string monkeyFilename = "../../Resources/monkey" + std::to_string(i + 1) + ".png";
+        std::string monkeyFilename = "../../Resources/m3/monkey" + std::to_string(i + 1) + ".png";
         monkeySurface = IMG_Load(monkeyFilename.c_str());
         if (!monkeySurface)
         {
@@ -86,7 +42,7 @@ Mode3::Mode3() {
         SDL_FreeSurface(monkeySurface);
     }
 
-    // ì›ìˆ­ì´ ì´ˆê¸° ìœ„ì¹˜ ì„¤ì •
+    // ¿ø¼şÀÌ ÃÊ±â À§Ä¡ ¼³Á¤
     monkeyRect.x = 430;
     monkeyRect.y = MONKEY_START_Y;
     monkeyRect.w = monkeySurface->w;
@@ -95,18 +51,18 @@ Mode3::Mode3() {
     MONKEY_START_Y = 150;
 
     currentCharacterIndex = 0;
-    //ìºë¦­í„°
+    //Ä³¸¯ÅÍ
     SDL_Surface* surface;
     {
         for (int i = 0; i < 2; ++i) {
-            std::string imagePath = "../../Resources/User" + std::to_string(i + 1) + ".png";
+            std::string imagePath = "../../Resources/m3/User" + std::to_string(i + 1) + ".png";
             surface = IMG_Load(imagePath.c_str());
             chTextures[i] = SDL_CreateTextureFromSurface(g_renderer, surface);
             SDL_FreeSurface(surface);
         }
     }
 
-    // ì›ìˆ­ì´ ì´ˆê¸° ìœ„ì¹˜ ì„¤ì •
+    // ¿ø¼şÀÌ ÃÊ±â À§Ä¡ ¼³Á¤
     chRect.x = 360;
     chRect.y = CH_START_Y;
     chRect.w = surface->w;
@@ -116,14 +72,14 @@ Mode3::Mode3() {
 
 
 
-    // ëŒ ìˆ«ì ì´ˆê¸°í™”
+    // µ¹ ¼ıÀÚ ÃÊ±âÈ­
     stoneNumbers.resize(NUM_STONES);
     for (int i = 0; i < NUM_STONES; ++i) {
         stoneNumbers[i] = randomDistribution(randomEngine);
     }
     {
         for (int i = 0; i < 4; ++i) {
-            std::string imagePath = "../../Resources/stone_" + std::to_string(i + 1) + ".png";
+            std::string imagePath = "../../Resources/m3/stone_" + std::to_string(i + 1) + ".png";
             SDL_Surface* surface = IMG_Load(imagePath.c_str());
             stoneTextures[i] = SDL_CreateTextureFromSurface(g_renderer, surface);
             SDL_FreeSurface(surface);
@@ -134,7 +90,7 @@ Mode3::Mode3() {
 
     //Tutorial
     {
-        SDL_Surface* bg_surface = IMG_Load("../../Resources/tt_3.png");
+        SDL_Surface* bg_surface = IMG_Load("../../Resources/m3/tt_3.png");
         g_tt_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface);
         SDL_FreeSurface(bg_surface);
 
@@ -150,15 +106,15 @@ Mode3::Mode3() {
     }
 
 
-    // ë°°ê²½ ì´ë¯¸ì§€ ë¡œë“œ
-    bg_surface = IMG_Load("../../Resources/Mode3_bg_all.png");
-    bg_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface); // GPUë¡œ ì˜®ê¸°ê¸° 
+    // ¹è°æ ÀÌ¹ÌÁö ·Îµå
+    bg_surface = IMG_Load("../../Resources/m3/Mode3_bg_all.png");
+    bg_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface); // GPU·Î ¿Å±â±â 
     SDL_FreeSurface(bg_surface);
-    backgroundY = -2400; 	// ë°°ê²½ ì´ë¯¸ì§€ ì´ˆê¸° ìœ„ì¹˜ ì„¤ì • (í™”ë©´ ìœ„ë¡œ)
+    backgroundY = -2400; 	// ¹è°æ ÀÌ¹ÌÁö ÃÊ±â À§Ä¡ ¼³Á¤ (È­¸é À§·Î)
 
     //wall
     {
-        SDL_Surface* bg_surface = IMG_Load("../../Resources/Mode3_wall.png");
+        SDL_Surface* bg_surface = IMG_Load("../../Resources/m3/Mode3_wall.png");
         g_w_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface);
         SDL_FreeSurface(bg_surface);
 
@@ -173,9 +129,9 @@ Mode3::Mode3() {
         g_w_destination_rect.h = 600;
     }
 
-    //caught ëŒ
+    //caught µ¹
     {
-        SDL_Surface* bg_surface = IMG_Load("../../Resources/caught.png");
+        SDL_Surface* bg_surface = IMG_Load("../../Resources/m3/caught.png");
         g_caught_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface);
         SDL_FreeSurface(bg_surface);
 
@@ -193,7 +149,7 @@ Mode3::Mode3() {
 
     // Start Button
     {
-        SDL_Surface* temp_surface = IMG_Load("../../Resources/Play_Btn_Up.png");
+        SDL_Surface* temp_surface = IMG_Load("../../Resources/m3/Play_Btn_Up.png");
         texture_ = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
         SDL_FreeSurface(temp_surface);
 
@@ -208,9 +164,9 @@ Mode3::Mode3() {
     }
 
 
-    // ë’¤ë¡œê°€ê¸° Button
+    // µÚ·Î°¡±â Button
     {
-        SDL_Surface* temp_surface = IMG_Load("../../Resources/Back_Btn_Up.png");
+        SDL_Surface* temp_surface = IMG_Load("../../Resources/m3/Back_Btn_Up.png");
         texture_bb = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
         SDL_FreeSurface(temp_surface);
 
@@ -229,7 +185,7 @@ Mode3::Mode3() {
 
     // Ready
     {
-        SDL_Surface* temp_surface = IMG_Load("../../Resources/ready.png");
+        SDL_Surface* temp_surface = IMG_Load("../../Resources/m3/ready.png");
         texture_ready = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
         SDL_FreeSurface(temp_surface);
         SDL_QueryTexture(texture_ready, NULL, NULL, &source_rectangle_ready.w, &source_rectangle_ready.h);
@@ -240,7 +196,7 @@ Mode3::Mode3() {
 
     // Start
     {
-        SDL_Surface* temp_surface = IMG_Load("../../Resources/start.png");
+        SDL_Surface* temp_surface = IMG_Load("../../Resources/m3/start.png");
         texture_start = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
         SDL_FreeSurface(temp_surface);
         SDL_QueryTexture(texture_start, NULL, NULL, &source_rectangle_start.w, &source_rectangle_start.h);
@@ -253,7 +209,7 @@ Mode3::Mode3() {
     // 
     // Finish
     {
-        SDL_Surface* temp_surface = IMG_Load("../../Resources/finish.png");
+        SDL_Surface* temp_surface = IMG_Load("../../Resources/m3/m3_finish.png");
         texture_finish = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
         SDL_FreeSurface(temp_surface);
 
@@ -264,15 +220,15 @@ Mode3::Mode3() {
         source_rectangle_finish.w = 800;
         source_rectangle_finish.h = 600;
 
-        destination_rectangle_finish.x = 30;
-        destination_rectangle_finish.y = 30;
-        destination_rectangle_finish.w = 700;
-        destination_rectangle_finish.h = 500;
+        destination_rectangle_finish.x = 0;
+        destination_rectangle_finish.y = 0;
+        destination_rectangle_finish.w = 800;
+        destination_rectangle_finish.h = 600;
     }
 
     // game over
     {
-        SDL_Surface* temp_surface = IMG_Load("../../Resources/m3_gameover.png");
+        SDL_Surface* temp_surface = IMG_Load("../../Resources/m3/m3_gameover.png");
         texture_gameover = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
         SDL_FreeSurface(temp_surface);
 
@@ -291,13 +247,13 @@ Mode3::Mode3() {
 
     // Home Button
     {
-        SDL_Surface* temp_surface = IMG_Load("../../Resources/home_button.png");
+        SDL_Surface* temp_surface = IMG_Load("../../Resources/m3/home_button.png");
         texture_hb = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
         SDL_FreeSurface(temp_surface);
 
         SDL_QueryTexture(texture_hb, NULL, NULL, &source_rectangle_hb.w, &source_rectangle_hb.h);
         destination_rectangle_hb.x = 210;
-        destination_rectangle_hb.y = 480;
+        destination_rectangle_hb.y = 435;
         source_rectangle_hb.x = 0;
         source_rectangle_hb.y = 0;
 
@@ -307,13 +263,13 @@ Mode3::Mode3() {
 
     // Retry Button
     {
-        SDL_Surface* temp_surface = IMG_Load("../../Resources/retry_button.png");
+        SDL_Surface* temp_surface = IMG_Load("../../Resources/m3/retry_button.png");
         texture_rb = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
         SDL_FreeSurface(temp_surface);
 
         SDL_QueryTexture(texture_rb, NULL, NULL, &source_rectangle_rb.w, &source_rectangle_rb.h);
-        destination_rectangle_rb.x = 400;
-        destination_rectangle_rb.y = 480;
+        destination_rectangle_rb.x = 440;
+        destination_rectangle_rb.y = 435;
         source_rectangle_rb.x = 0;
         source_rectangle_rb.y = 0;
 
@@ -378,22 +334,22 @@ void Mode3::Update()
     // game_start
     if (game_start && !game_over) {
 
-        // ì›ìˆ­ì´ ê³„ì† ìœ„ë¡œ ì˜¬ë¼ê° (ì¤‘ë ¥ ìœ„ë¡œ ì ìš©)
+        // ¿ø¼şÀÌ °è¼Ó À§·Î ¿Ã¶ó°¨ (Áß·Â À§·Î Àû¿ë)
         monkeyY -= 1;
 
-        // ì›ìˆ­ì´ ì• ë‹ˆë©”ì´ì…˜ ë° ì´ë™ ì²˜ë¦¬
+        // ¿ø¼şÀÌ ¾Ö´Ï¸ŞÀÌ¼Ç ¹× ÀÌµ¿ Ã³¸®
         monkeyTimer++;
-        if (monkeyTimer % 15 == 0) // 1ì´ˆì— í•œ ë²ˆì”© ì• ë‹ˆë©”ì´ì…˜ ë³€ê²½
+        if (monkeyTimer % 15 == 0) // 1ÃÊ¿¡ ÇÑ ¹ø¾¿ ¾Ö´Ï¸ŞÀÌ¼Ç º¯°æ
         {
-            monkeyFrame = (monkeyFrame + 1) % 2; // monkey1.pngê³¼ monkey2.png ì‚¬ì´ì—ì„œ ë°˜ë³µ
+            monkeyFrame = (monkeyFrame + 1) % 2; // monkey1.png°ú monkey2.png »çÀÌ¿¡¼­ ¹İº¹
         }
 
-        // ì›ìˆ­ì´ ì¡í ê²½ìš°
+        // ¿ø¼şÀÌ ÀâÈú °æ¿ì
         SDL_Rect intersection;
         if (SDL_IntersectRect(&chRect, &monkeyRect, &intersection) == SDL_TRUE && intersection.h >= 60)
         {
             gameoverTime = SDL_GetTicks();
-            monkeyFrame = 2; // ì›ìˆ­ì´ ì¡íŒ ê²½ìš° monkey3.pngë¡œ ë³€ê²½
+            monkeyFrame = 2; // ¿ø¼şÀÌ ÀâÈù °æ¿ì monkey3.png·Î º¯°æ
            
             result = 2;
             tutorial = false;
@@ -415,10 +371,10 @@ void Mode3::Update()
             chY += 5;
         }
        
-        // í˜„ì¬ ì‹œê°„ê³¼ ì¶©ëŒ ê°ì§€ ì‹œê°„ ê°„ì˜ ì°¨ì´ ê³„ì‚°
+        // ÇöÀç ½Ã°£°ú Ãæµ¹ °¨Áö ½Ã°£ °£ÀÇ Â÷ÀÌ °è»ê
         Uint32 elapsedTime = currentTime - gameoverTime;
 
-        // 2ì´ˆê°€ ê²½ê³¼í•œ ê²½ìš° ê²Œì„ ì—”ë”©ìœ¼ë¡œ ì „í™˜
+        // 2ÃÊ°¡ °æ°úÇÑ °æ¿ì °ÔÀÓ ¿£µùÀ¸·Î ÀüÈ¯
         if (game_over && elapsedTime >= 1000) {
             tutorial = false;
             ready = false;
@@ -431,7 +387,7 @@ void Mode3::Update()
 
     if (game_start) {
         if (stonesOnScreen == 0) {
-            // í™”ë©´ì— ëŒì´ ì—†ëŠ” ê²½ìš° ìƒˆë¡œìš´ ëŒì„ ì¶”ê°€
+            // È­¸é¿¡ µ¹ÀÌ ¾ø´Â °æ¿ì »õ·Î¿î µ¹À» Ãß°¡
             stoneNumbers.push_back(randomDistribution(randomEngine));
             stonesOnScreen = NUM_STONES;
         }
@@ -459,7 +415,7 @@ void Mode3::Render() {
 
     SDL_RenderClear(g_renderer);
 
-    //ë°°ê²½ì´ì–´ì§€ê¸°
+    //¹è°æÀÌ¾îÁö±â
     SDL_Rect backgroundRect = { 0, backgroundY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT };
     SDL_RenderCopy(g_renderer, bg_texture, NULL, &backgroundRect);
 
@@ -496,12 +452,12 @@ void Mode3::Render() {
     }
     else if (game_start || game_over) {
 
-        //ì¡ì€ ëŒ
+        //ÀâÀº µ¹
         SDL_RenderCopy(g_renderer, g_caught_texture, &g_caught_source_rect, &g_caught_destination_rect);
 
-        //ìºë¦­í„°
+        //Ä³¸¯ÅÍ
         {
-            chRect.y = chY; // ìºë¦­í„° Y ì¢Œí‘œ ì—…ë°ì´íŠ¸
+            chRect.y = chY; // Ä³¸¯ÅÍ Y ÁÂÇ¥ ¾÷µ¥ÀÌÆ®
             SDL_Rect tmp_r;
             tmp_r.x = chRect.x;
             tmp_r.y = chRect.y;
@@ -510,9 +466,9 @@ void Mode3::Render() {
             SDL_RenderCopy(g_renderer, chTextures[currentCharacterIndex], nullptr, &chRect);
         }
        
-        //ì›ìˆ­ì´
+        //¿ø¼şÀÌ
         {
-            monkeyRect.y = monkeyY; // ì›ìˆ­ì´ì˜ Y ì¢Œí‘œ ì—…ë°ì´íŠ¸
+            monkeyRect.y = monkeyY; // ¿ø¼şÀÌÀÇ Y ÁÂÇ¥ ¾÷µ¥ÀÌÆ®
             SDL_Rect tmp_r;
             tmp_r.x = monkeyRect.x;
             tmp_r.y = monkeyRect.y;
@@ -521,7 +477,7 @@ void Mode3::Render() {
             SDL_RenderCopy(g_renderer, monkeyTextures[monkeyFrame], nullptr, &tmp_r);
 
         }
-        // ëŒ
+        // µ¹
         for (int i = 0; i < NUM_STONES; ++i) {
             int stoneNumber = stoneNumbers[i];
             SDL_Rect stoneRect = { STONE_X, STONE_Y - (STONE_SPACING * i), STONE_WIDTH, STONE_HEIGHT };
@@ -572,7 +528,7 @@ void Mode3::HandleEvents() {
             {
                 int mouseX = event.button.x;
                 int mouseY = event.button.y;
-                //ë’¤ë¡œê°€ê¸°(homeìœ¼ë¡œ)
+                //µÚ·Î°¡±â(homeÀ¸·Î)
                 if (mouseX >= destination_rectangle_bb.x && mouseX < destination_rectangle_bb.x + destination_rectangle_bb.w
                     && mouseY >= destination_rectangle_bb.y && mouseY < destination_rectangle_bb.y + destination_rectangle_bb.h
                     && g_current_game_phase == PHASE_MODE3) {
@@ -585,7 +541,7 @@ void Mode3::HandleEvents() {
                     game_ending = false;
                     ResetGame();
                 }
-                //ë’¤ë¡œê°€ê¸°(homeìœ¼ë¡œ)
+                //µÚ·Î°¡±â(homeÀ¸·Î)
                 if (mouseX >= destination_rectangle_hb.x && mouseX < destination_rectangle_hb.x + destination_rectangle_hb.w
                     && mouseY >= destination_rectangle_hb.y && mouseY < destination_rectangle_hb.y + destination_rectangle_hb.h
                     && g_current_game_phase == PHASE_MODE3) {
@@ -631,23 +587,23 @@ void Mode3::HandleEvents() {
             int key = event.key.keysym.sym - SDLK_0;
             if (key >= 1 && key <= 4) {
                 if (!ready && !start && game_start) {
-                    // ë§ëŠ” ëŒì„ ëˆŒë €ì„ ë•Œ ìºë¦­í„° ì´ë¯¸ì§€ ë³€ê²½
+                    // ¸Â´Â µ¹À» ´­·¶À» ¶§ Ä³¸¯ÅÍ ÀÌ¹ÌÁö º¯°æ
                     currentCharacterIndex = (currentCharacterIndex + 1) % 2;
                     if (key == stoneNumbers[0]) {
 
-                        // ì˜¬ë°”ë¥¸ ìˆ«ìë¥¼ ì…ë ¥í•œ ê²½ìš° ëŒë“¤ì„ ì•„ë˜ë¡œ ì´ë™
+                        // ¿Ã¹Ù¸¥ ¼ıÀÚ¸¦ ÀÔ·ÂÇÑ °æ¿ì µ¹µéÀ» ¾Æ·¡·Î ÀÌµ¿
                         stoneNumbers.erase(stoneNumbers.begin());
                         stoneNumbers.push_back(randomDistribution(randomEngine));
                         correct_button = true;
 
-                        // í”Œë ˆì´ì–´ê°€ ëŒì„ ëˆ„ë¥¸ ì‹œê°„ ê¸°ë¡
+                        // ÇÃ·¹ÀÌ¾î°¡ µ¹À» ´©¸¥ ½Ã°£ ±â·Ï
                         lastStonePressTime = SDL_GetTicks();
 
                         velocityY -= monkeySpeed;
                        
                     }
                     else {
-                        // ì˜ëª»ëœ ìˆ«ìë¥¼ ì…ë ¥í•œ ê²½ìš° ê²Œì„ ì˜¤ë²„
+                        // Àß¸øµÈ ¼ıÀÚ¸¦ ÀÔ·ÂÇÑ °æ¿ì °ÔÀÓ ¿À¹ö
                         result = 1;
                         game_over = true;
                         gameoverTime = SDL_GetTicks();
@@ -667,12 +623,12 @@ void Mode3::HandleEvents() {
 void Mode3::ResetGame() {
 
     monkeyY = 100;
-    //result 1 = ê²Œì„ì˜¤ë²„/ result 1 = finish
+    //result 1 = °ÔÀÓ¿À¹ö/ result 1 = finish
     result = 0;
     velocityY = 0;
     correct_button = false;
 
-    // ì›ìˆ­ì´ ì´ˆê¸° ìœ„ì¹˜ ì„¤ì •
+    // ¿ø¼şÀÌ ÃÊ±â À§Ä¡ ¼³Á¤
     MONKEY_START_Y = 150;
     monkeyRect.x = 430;
     monkeyRect.y = MONKEY_START_Y;
@@ -681,7 +637,7 @@ void Mode3::ResetGame() {
 
     currentCharacterIndex = 0;
 
-    // ìºë¦­í„° ì´ˆê¸° ìœ„ì¹˜ ì„¤ì •
+    // Ä³¸¯ÅÍ ÃÊ±â À§Ä¡ ¼³Á¤
     CH_START_Y = 420;
     chRect.x = 360;
     chRect.y = CH_START_Y;
@@ -689,7 +645,7 @@ void Mode3::ResetGame() {
 
   
 
-    backgroundY = -2400; 	// ë°°ê²½ ì´ë¯¸ì§€ ì´ˆê¸° ìœ„ì¹˜ ì„¤ì • (í™”ë©´ ìœ„ë¡œ)
+    backgroundY = -2400; 	// ¹è°æ ÀÌ¹ÌÁö ÃÊ±â À§Ä¡ ¼³Á¤ (È­¸é À§·Î)
 
 
 

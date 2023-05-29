@@ -30,14 +30,14 @@ private:
 	SDL_Rect g_stone_destination_rect;
 	SDL_Texture* stoneTextures[4];
 
-	//ìºë¦­í„°
+	//Ä³¸¯ÅÍ
 	SDL_Rect g_ch_source_rect;
 	SDL_Rect g_ch_destination_rect;
 	
 
 	//BackGround
 
-// ë°°ê²½ ì´ë¯¸ì§€ í¬ê¸°
+// ¹è°æ ÀÌ¹ÌÁö Å©±â
 	const int BACKGROUND_WIDTH = 800;
 	const int BACKGROUND_HEIGHT = 3000;
 	// bg
@@ -45,9 +45,9 @@ private:
 	SDL_Texture* bg_texture;
 	SDL_Rect bg_rect;
 	SDL_Rect bg_dest_rect;
-	int backgroundY; // ë°°ê²½ ì´ë¯¸ì§€ì˜ Y ì¢Œí‘œ
+	int backgroundY; // ¹è°æ ÀÌ¹ÌÁöÀÇ Y ÁÂÇ¥
 
-// ê²Œì„ ì°½ í¬ê¸°
+// °ÔÀÓ Ã¢ Å©±â
 	const int WINDOW_WIDTH = 800;
 	const int WINDOW_HEIGHT = 600;
 
@@ -56,7 +56,7 @@ private:
 	SDL_Rect g_w_destination_rect;
 	SDL_Texture* g_w_texture;
 
-	//ì¡ì€ ëŒ
+	//ÀâÀº µ¹
 	SDL_Rect g_caught_source_rect;
 	SDL_Rect g_caught_destination_rect;
 	SDL_Texture* g_caught_texture;
@@ -122,17 +122,61 @@ private:
 	int currentCharacterIndex;
 	bool correct_button;
 
-	// ì›ìˆ­ì´ ìœ„ì¹˜
+	// ¿ø¼şÀÌ À§Ä¡
 	int MONKEY_START_Y = 150;
-	const int monkeySpeed = 3; // ì›ìˆ­ì´ì˜ ì†ë„, í´ë¼ì´ë° ì†ë„ì— ë”°ë¼ ì¡°ì ˆ ê°€ëŠ¥
+	const int monkeySpeed = 4; // ¿ø¼şÀÌÀÇ ¼Óµµ, Å¬¶óÀÌ¹Ö ¼Óµµ¿¡ µû¶ó Á¶Àı °¡´É
 	int monkeyY = MONKEY_START_Y;
 	int velocityY = 0;
 
-	//ìºë¦­í„°
+	//Ä³¸¯ÅÍ
 	//int CH_X = 360;
 	//int CH_WIDTH = 120;
 	//int CH_HEIGHT = 144;
 	int CH_START_Y = 420;
 	int chY = CH_START_Y;
+
+
+
+
+	// µ¹ Å©±â
+	const int STONE_WIDTH = 64;
+	const int STONE_HEIGHT = 64;
+
+	// µ¹ ÀÌ¹ÌÁö Ãâ·Â °³¼ö
+	const int NUM_STONES = 5;
+
+	
+
+	// µ¹ ÀÌ¹ÌÁö À§Ä¡
+	const int STONE_X = 370; // µ¹ÀÇ X ÁÂÇ¥
+	const int STONE_Y = 350; // µ¹ÀÇ Y ÁÂÇ¥
+	const int STONE_SPACING = 110; // µ¹ »çÀÌÀÇ °£°İ
+	Uint32 startTime = 0;
+	Uint32 gameoverTime = 0;
+
+
+	
+
+
+
+	std::vector<int> stoneNumbers; // ¼ıÀÚ ÀúÀå¿ë ¹è¿­
+	int stonesOnScreen; // È­¸é¿¡ Ãâ·ÂµÇ´Â µ¹ÀÇ °³¼ö
+
+
+
+
+
+	// ÇÃ·¹ÀÌ¾î°¡ µ¹À» ´©¸¥ ½Ã°£ ±â·Ï
+	Uint32 lastStonePressTime = 0;
+
+
+	SDL_Texture* chTextures[2];
+	SDL_Rect chRect;
+
+
+	SDL_Texture* monkeyTextures[3];
+	SDL_Rect monkeyRect;
+	int monkeyFrame = 0;
+	int monkeyTimer = 0;
 };
 

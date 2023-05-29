@@ -27,7 +27,7 @@ int main(int argc, char* argv[])
 	TTF_Init();
 
 
-	g_window = SDL_CreateWindow("First Window", 100, 100, 500, 500, 0);
+	g_window = SDL_CreateWindow("First Window", 100, 100, 800, 600, 0);
 	g_renderer = SDL_CreateRenderer(g_window, -1, 0);
 
 
