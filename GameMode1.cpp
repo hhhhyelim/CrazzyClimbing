@@ -14,6 +14,34 @@ const int WALL_WIDTH = 400;
 const int WALL_HEIGHT = 5400;
 
 
+//인트로 (tuto)
+SDL_Texture* g_texture_intro;
+SDL_Rect g_source_rectangle_intro;
+SDL_Rect g_destination_rectangle_intro;
+
+//플레이버튼
+SDL_Texture* g_texture_play;
+SDL_Rect g_source_rectangle_play;
+SDL_Rect g_destination_rectangle_play;
+
+//ready
+SDL_Surface* ready_surface;
+SDL_Texture* ready_texture;
+SDL_Rect ready_rect;
+SDL_Rect ready_dest_rect;
+
+// start
+SDL_Surface* start_surface;
+SDL_Texture* start_texture;
+SDL_Rect start_rect;
+SDL_Rect start_dest_rect;
+
+// introBack button
+SDL_Surface* introBack_surface;
+SDL_Texture* introBack_texture;
+SDL_Rect introBack_rect;
+SDL_Rect introBack_dest_rect;
+
 // bg
 SDL_Surface* bg_surface;
 SDL_Texture* bg_texture;
@@ -62,12 +90,6 @@ SDL_Texture* rightUser_texture;
 SDL_Rect rightUser_rect;
 SDL_Rect rightUser_dest_rect;
 
-//뒤로가기버튼
-SDL_Surface* back_surface;
-SDL_Texture* back_texture;
-SDL_Rect back_rect;
-SDL_Rect back_dest_rect;
-
 // stun 효과
 SDL_Surface* stun_surface;
 SDL_Texture* stun_texture;
@@ -80,17 +102,65 @@ int f_state; // 1:down 2:left 3: right 4: up
 bool isLeftUser = true;
 string nextHoldPath = "";
 int prevHoldIndex = -1;
-Uint32 startsTime;
 
+Uint32 startTime = 0;
+Uint32 gameoverTime = 0;
+
+Uint32 startsTime;
 
 Mode1::Mode1() {
 	g_flag_running = true;
 	cur_i = 1;
 	prevHold = 0;
 	startsTime = SDL_GetTicks();
+	// state
+	tutorial = true;
+	ready = false;
+	start = false;
+	game_start = false;
+	game_over = false;
+
+	
+
+	// intro (tutorial)
+	SDL_Surface* temp_surface = IMG_Load("../src/tutorial_mode1.png");
+	g_texture_intro = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
+	SDL_FreeSurface(temp_surface);
+	SDL_QueryTexture(g_texture_intro, NULL, NULL, &g_source_rectangle_intro.w, &g_source_rectangle_intro.h);
+	g_source_rectangle_intro = { 0, 0, 800, 600 };
+	g_destination_rectangle_intro = { 95, 40, 620, 480 };
+
+	// play Button (Start button)
+	SDL_Surface* play_surface = IMG_Load("../src/play.png");
+	g_texture_play = SDL_CreateTextureFromSurface(g_renderer, play_surface);
+	SDL_FreeSurface(play_surface);
+	SDL_QueryTexture(g_texture_play, NULL, NULL, &g_source_rectangle_play.w, &g_source_rectangle_play.h);
+	g_source_rectangle_play = { 0, 0, 160, 80 };
+	g_destination_rectangle_play = { 320, 510, 160, 80 };
+
+
+	//뒤로가기
+	introBack_surface = IMG_Load("../src/back.png");
+	introBack_texture = SDL_CreateTextureFromSurface(g_renderer, introBack_surface);
+	SDL_FreeSurface(introBack_surface);
+	introBack_rect = { 0, 0, introBack_surface->w,introBack_surface->h };
+	introBack_dest_rect = { 10, 10, introBack_surface->w, introBack_surface->h };
+
+	// ready
+	ready_surface = IMG_Load("../src/ready.png");
+	ready_texture = SDL_CreateTextureFromSurface(g_renderer, ready_surface);
+	SDL_FreeSurface(ready_surface);
+	ready_rect = { 0, 0, ready_surface->w,ready_surface->h };
+	ready_dest_rect = { 10, 10, ready_surface->w, ready_surface->h };
+	
+	// start
+	start_surface = IMG_Load("../src/start.png");
+	start_texture = SDL_CreateTextureFromSurface(g_renderer, start_surface);
+	SDL_FreeSurface(start_surface);
+	start_rect = { 0, 0, start_surface->w,start_surface->h };
+	start_dest_rect = { 10, 10, start_surface->w, start_surface->h };
 
 	// 배경 이미지 로드
-
 	bg_surface = IMG_Load("../src/bg_mode1.png");
 	bg_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface); // GPU로 옮기기 
 	SDL_FreeSurface(bg_surface);
@@ -175,13 +245,6 @@ Mode1::Mode1() {
 	rightUser_rect = { 0, 0, rightUser_surface->w, rightUser_surface->h };
 	rightUser_dest_rect = { 410, 427, rightUser_surface->w, rightUser_surface->h }; // 원래 440
 
-	//뒤로가기
-	back_surface = IMG_Load("../src/back.png");
-	back_texture = SDL_CreateTextureFromSurface(g_renderer, back_surface);
-	SDL_FreeSurface(back_surface);
-	back_rect = { 0, 0, back_surface->w, back_surface->h };
-	back_dest_rect = { 10, 10, back_surface->w, back_surface->h };
-
 	/*
 	stun_surface = IMG_Load("../src/stun.png");
 	stun_texture = SDL_CreateTextureFromSurface(g_renderer, stun_surface);
@@ -193,6 +256,9 @@ Mode1::Mode1() {
 
 Mode1::~Mode1() {
 
+	SDL_DestroyTexture(g_texture_intro); // tuto
+	SDL_DestroyTexture(g_texture_play); // play Button
+
 	SDL_DestroyTexture(bg_texture);
 	SDL_DestroyTexture(wall_texture);
 	//SDL_DestroyTexture(time_texture);
@@ -203,48 +269,95 @@ Mode1::~Mode1() {
 	}
 	SDL_DestroyTexture(leftUser_texture);
 	SDL_DestroyTexture(rightUser_texture);
-	SDL_DestroyTexture(back_texture);
+	SDL_DestroyTexture(introBack_texture);
+
 
 }
 
 void Mode1::Update()
 {
-	Uint32 currentTime = SDL_GetTicks();  // 현재 시간 가져오기
-	Uint32 elapsedTime = currentTime - startsTime;  // 경과 시간 계산
-	Uint32 seconds = currentTime / 1000;  // 경과 시간을 초로 변환
 
-	// 시간을 화면에 표시하기 위해 문자열로 변환
-	std::string gameTimeString = "Time:" + std::to_string(seconds) + "s";
+	Uint32 currentTime = SDL_GetTicks();
 
-	// 문자열을 표시할 표면 생성
-	SDL_Color black = { 0, 0, 0, 0 };
-	time_surface = TTF_RenderText_Solid(font, gameTimeString.c_str(), black);
+	// Ready, Start
+	if (ready) {
+		if (currentTime - startTime >= 2000) {
 
-	// 표면을 텍스처로 변환
-	time_texture = SDL_CreateTextureFromSurface(g_renderer, time_surface);
-	SDL_FreeSurface(time_surface);
+			startTime = currentTime;
 
-	// 텍스처의 크기 및 위치 설정
-	SDL_QueryTexture(time_texture, NULL, NULL, &(time_rect.w), &(time_rect.h));
-	time_rect.x = 47;
-	time_rect.y = 28;
+			tutorial = false;
+			ready = false;
+			start = true;
+			game_start = false;
+			game_over = false;
 
 
-	if (checkHold() == true) {
-		userMove();
-		holdMove();
-		cur_i++;
-
-		backgroundY += 30;
-		wallY += 118;
-
+		}
 	}
+	else if (start) {
+		if (currentTime - startTime >= 1000) {
+
+			startTime = currentTime;
+
+			tutorial = false;
+			ready = false;
+			start = false;
+			game_start = true;
+			game_over = false;
+			
+		}
+	}
+	if (game_start && !game_over) {
+		Uint32 current2Time = SDL_GetTicks();  // 현재 시간 가져오기
+		Uint32 elapsedTime = current2Time - startsTime;  // 경과 시간 계산
+		Uint32 seconds = current2Time / 1000;  // 경과 시간을 초로 변환
+
+		// 시간을 화면에 표시하기 위해 문자열로 변환
+		std::string gameTimeString = "Time:" + std::to_string(seconds) + "s";
+
+		// 문자열을 표시할 표면 생성
+		SDL_Color black = { 0, 0, 0, 0 };
+		time_surface = TTF_RenderText_Solid(font, gameTimeString.c_str(), black);
+
+		// 표면을 텍스처로 변환
+		time_texture = SDL_CreateTextureFromSurface(g_renderer, time_surface);
+		SDL_FreeSurface(time_surface);
+
+		// 텍스처의 크기 및 위치 설정
+		SDL_QueryTexture(time_texture, NULL, NULL, &(time_rect.w), &(time_rect.h));
+		time_rect.x = 47;
+		time_rect.y = 28;
 
 
+		if (checkHold() == true) {
+			userMove();
+			holdMove();
+			cur_i++;
+
+			backgroundY += 30;
+			wallY += 118;
+
+		}
+
+		if (cur_i == 40) {
+			gameoverTime = SDL_GetTicks();
+			game_over = true;
+		}
+	}
+	if (game_over) {
+		Uint32 elapsedTime = currentTime - gameoverTime;
+		if (game_over && elapsedTime >= 2000) {
+			g_current_game_phase = PHASE_ENDING1;
+			game_over = false;
+			ready = false;
+		}
+	}
+	
 }
 
 void Mode1::Render() {
 	SDL_RenderClear(g_renderer);
+
 
 	//배경이어지기
 	SDL_Rect backgroundRect = { 0, backgroundY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT };
@@ -254,10 +367,7 @@ void Mode1::Render() {
 	SDL_Rect wallRect = { 200, wallY, WALL_WIDTH, WALL_HEIGHT };
 	SDL_RenderCopy(g_renderer, wall_texture, NULL, &wallRect);
 
-
 	SDL_RenderCopy(g_renderer, time_texture, NULL, &time_rect);
-
-
 	for (size_t i = 0; i < hold_textures.size(); i++) {
 		SDL_RenderCopy(g_renderer, hold_textures[i], &hold_rects[i], &hold_dest_rects[i]);
 	}
@@ -265,7 +375,26 @@ void Mode1::Render() {
 	SDL_RenderCopy(g_renderer, timeBg_texture, &timeBg_rect, &timeBg_dest_rect);
 	SDL_RenderCopy(g_renderer, time_texture, NULL, &time_rect);
 
-	
+	if (tutorial) {
+		
+		SDL_RenderCopy(g_renderer, g_texture_intro, &g_source_rectangle_intro, &g_destination_rectangle_intro);
+		SDL_RenderCopy(g_renderer, g_texture_play, &g_source_rectangle_play, &g_destination_rectangle_play);
+		SDL_RenderCopy(g_renderer, introBack_texture, &introBack_rect, &introBack_dest_rect);
+	}
+	else if (ready) {
+		
+		SDL_RenderCopy(g_renderer, ready_texture, &ready_rect, &ready_dest_rect);
+	}
+	else if (start) {
+		
+		SDL_RenderCopy(g_renderer, start_texture, &start_rect, &start_dest_rect);
+	}
+	/*
+	else if (game_start) {
+
+
+	}
+	*/	
 
 	SDL_RenderPresent(g_renderer);
 }
@@ -297,11 +426,12 @@ void Mode1::holdMove() {
 	for (SDL_Rect& hold_dest_rect : hold_dest_rects) {
 		hold_dest_rect.y += 100;
 	}
-	
+	/*
 	if (cur_i == 40) {
 		SDL_Delay(1000);
 		g_current_game_phase = PHASE_ENDING1;
 	}
+	*/
 }
 
 
@@ -325,6 +455,36 @@ void Mode1::HandleEvents() {
 		switch (event.type) {
 		case SDL_QUIT:
 			g_flag_running = false;
+			break;
+
+		case SDL_MOUSEBUTTONDOWN:
+			if (event.button.button == SDL_BUTTON_LEFT) {
+
+				int mouse_x = event.button.x;
+				int mouse_y = event.button.y;
+
+				/*
+				// introBack 버튼
+				if (mouse_x >= ready_dest_rect.x &&
+					mouse_x <= ready_dest_rect.x + ready_dest_rect.w &&
+					mouse_y >= ready_dest_rect.y &&
+					mouse_y <= ready_dest_rect.y + ready_dest_rect.h) {
+					// g_current_game_phase = PHASE_HOME;
+				
+				}
+				*/
+				// game start 버튼
+				if (mouse_x >= g_destination_rectangle_play.x &&
+					mouse_x <= g_destination_rectangle_play.x + g_destination_rectangle_play.w &&
+					mouse_y >= g_destination_rectangle_play.y &&
+					mouse_y <= g_destination_rectangle_play.y + g_destination_rectangle_play.h) {
+					ready = true;
+					start = true;
+					tutorial = false;
+					startTime = SDL_GetTicks();
+				}
+			}
+
 			break;
 
 
@@ -386,8 +546,8 @@ void Mode1::ResetGame() {
 	cur_i = 1;
 	prevHold = 0;
 
-	wall_dest_rect.y = 0;
-	bg_dest_rect.y = 0;
+	// wall_dest_rect.y = 0;
+	// bg_dest_rect.y = 0;
 
 	isLeftUser = true;
 	leftUser_dest_rect = { 280, 427, leftUser_surface->w, leftUser_surface->h };
