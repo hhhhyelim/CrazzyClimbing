@@ -2,6 +2,11 @@
 #include "GameHome.h"
 
 Home::Home() {
+	//오디오
+	Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 4096);
+	btn_sound = Mix_LoadWAV("../../Resources/Button_Sound.wav");
+	home_bgm = Mix_LoadMUS("../../Resources/home_bgm");
+
 	// BackGround
 	SDL_Surface* bg_surface = IMG_Load("../../Resources/bg_home.png");
 	g_bg_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface);
@@ -72,7 +77,7 @@ Home::~Home() {
 	SDL_DestroyTexture(texture_m1);
 	SDL_DestroyTexture(texture_m2);
 	SDL_DestroyTexture(texture_m3);
-	
+
 }
 
 void Home::Update()
@@ -81,9 +86,15 @@ void Home::Update()
 }
 
 void Home::Render() {
+	//브금은 여기서 플레이
+	if (!Mix_PlayingMusic()) {
+		Mix_VolumeMusic(100);
+		Mix_PlayMusic(home_bgm, -1); // 무한반복
+	}
+
 	// Background
 	SDL_RenderCopy(g_renderer, g_bg_texture, &g_bg_source_rect, &g_bg_destination_rect);
-	
+
 	// Mode1 Button
 	SDL_RenderCopy(g_renderer, texture_m1, &source_rectangle_m1, &destination_rectangle_m1);
 
@@ -93,7 +104,7 @@ void Home::Render() {
 	// Mode3 Button
 	SDL_RenderCopy(g_renderer, texture_m3, &source_rectangle_m3, &destination_rectangle_m3);
 
-	
+
 	SDL_RenderPresent(g_renderer);
 }
 
@@ -118,14 +129,26 @@ void Home::HandleEvents() {
 				if (mouseX >= destination_rectangle_m1.x && mouseX < destination_rectangle_m1.x + destination_rectangle_m1.w
 					&& mouseY >= destination_rectangle_m1.y && mouseY < destination_rectangle_m1.y + destination_rectangle_m1.h) {
 					g_current_game_phase = PHASE_MODE1;
+
+					//wav은 여기서 플레이
+					Mix_VolumeChunk(btn_sound, MIX_MAX_VOLUME);
+					Mix_PlayChannel(3, btn_sound, 0); //무한반복 안하기
 				}
 				if (mouseX >= destination_rectangle_m2.x && mouseX < destination_rectangle_m2.x + destination_rectangle_m2.w
 					&& mouseY >= destination_rectangle_m2.y && mouseY < destination_rectangle_m2.y + destination_rectangle_m2.h) {
 					g_current_game_phase = PHASE_MODE2;
+
+					//wav은 여기서 플레이
+					Mix_VolumeChunk(btn_sound, MIX_MAX_VOLUME);
+					Mix_PlayChannel(3, btn_sound, 0); //무한반복 안하기
 				}
 				if (mouseX >= destination_rectangle_m3.x && mouseX < destination_rectangle_m3.x + destination_rectangle_m3.w
 					&& mouseY >= destination_rectangle_m3.y && mouseY < destination_rectangle_m3.y + destination_rectangle_m3.h) {
 					g_current_game_phase = PHASE_MODE3;
+
+					//wav은 여기서 플레이
+					Mix_VolumeChunk(btn_sound, MIX_MAX_VOLUME);
+					Mix_PlayChannel(3, btn_sound, 0); //무한반복 안하기
 				}
 
 			}

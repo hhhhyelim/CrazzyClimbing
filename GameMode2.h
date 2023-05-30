@@ -1,4 +1,4 @@
-ï»¿#pragma once
+#pragma once
 #include "Game.h"
 #include <vector>
 
@@ -14,17 +14,20 @@ public:
 	void holdMove();
 	bool checkHold();
 	void ResetGame();
-	void printscore(int count);
 
 private:
+	Mix_Music* mode2_bgm; //mp3
+	Mix_Chunk* jump_sound; // WAV ÆÄÀÏ ·Îµå
+	Mix_Chunk* btn_sound;
+	Mix_Chunk* mode2_gameover_bgm;
+
 	int cur_i;
 	int prevHold;
-
-
+	
 	Uint32 startTime = 0;
 	Uint32 gameoverTime = 0;
 
-	//È¦ï¿½å°¹ï¿½ï¿½ ï¿½ï¿½Æ®
+	//È¦µå°¹¼ö ÆùÆ®
 	int holdCount = 0;
 
 	// num
@@ -33,35 +36,35 @@ private:
 	SDL_Texture* num_texture;
 	SDL_Rect num_rect;
 
-	//ï¿½ï¿½Æ®ï¿½ï¿½
+	//ÀÎÆ®·Î
 	SDL_Texture* g_texture_intro;
 	SDL_Rect g_source_rectangle_intro;
 	SDL_Rect g_destination_rectangle_intro;
 
-	//ï¿½Ã·ï¿½ï¿½Ì¹ï¿½Æ°
+	//ÇÃ·¹ÀÌ¹öÆ°
 	SDL_Texture* g_texture_play;
 	SDL_Rect g_source_rectangle_play;
 	SDL_Rect g_destination_rectangle_play;
 
-	//ï¿½Ú·Î°ï¿½ï¿½ï¿½ï¿½Æ°
+	//µÚ·Î°¡±â¹öÆ°
 	SDL_Surface* introBack_surface;
 	SDL_Texture* introBack_texture;
 	SDL_Rect introBack_rect;
 	SDL_Rect introBack_dest_rect;
 
-	//ï¿½ï¿½ï¿½ï¿½
+	//·¹µð
 	SDL_Surface* ready_surface;
 	SDL_Texture* ready_texture;
 	SDL_Rect ready_rect;
 	SDL_Rect ready_dest_rect;
 
-	//ï¿½ï¿½ï¿½ï¿½
+	//½ÃÀÛ
 	SDL_Surface* start_surface;
 	SDL_Texture* start_texture;
 	SDL_Rect start_rect;
 	SDL_Rect start_dest_rect;
 
-	// ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ Å©ï¿½ï¿½
+	// ¹è°æ ÀÌ¹ÌÁö Å©±â
 	const int BACKGROUND_WIDTH = 800;
 	const int BACKGROUND_HEIGHT = 3000;
 
@@ -70,7 +73,7 @@ private:
 	SDL_Texture* bg_texture;
 	SDL_Rect bg_rect;
 	SDL_Rect bg_dest_rect;
-	int backgroundY; // ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ï¿½ï¿½ Y ï¿½ï¿½Ç¥
+	int backgroundY; // ¹è°æ ÀÌ¹ÌÁöÀÇ Y ÁÂÇ¥
 
 	// wall
 	SDL_Surface* wall_surface;
@@ -102,22 +105,22 @@ private:
 	SDL_Rect rightUser_rect;
 	SDL_Rect rightUser_dest_rect;
 
-	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
-	int gauge = 150; // ï¿½Ê±ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
-	int gaugeDecreaseRate = 1; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Óµï¿½
-	int gaugeDecreaseRate2 = 2; //50ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã¸ï¿½ï¿½ï¿½
+	//°ÔÀÌÁö
+	int gauge = 150; // ÃÊ±â °ÔÀÌÁö °ª
+	int gaugeDecreaseRate = 1; // °ÔÀÌÁö °¨¼Ò ¼Óµµ
+	int gaugeDecreaseRate2 = 2; //50°³ Áö³ª¸é °ÔÀÌÁö °¨¼Ò ´Ã¸®±â
 
-	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	//¿£µù»çÁø
 	SDL_Texture* g_texture_ending;
 	SDL_Rect g_source_rectangle_ending;
 	SDL_Rect g_destination_rectangle_ending;
 
-	//È¨ï¿½ï¿½Æ°
+	//È¨¹öÆ°
 	SDL_Texture* g_texture_home;
 	SDL_Rect g_source_rectangle_home;
 	SDL_Rect g_destination_rectangle_home;
 
-	//ï¿½Ù½Ã½ï¿½ï¿½Û¹ï¿½Æ°
+	//´Ù½Ã½ÃÀÛ¹öÆ°
 	SDL_Texture* g_texture_retry;
 	SDL_Rect g_source_rectangle_retry;
 	SDL_Rect g_destination_rectangle_retry;

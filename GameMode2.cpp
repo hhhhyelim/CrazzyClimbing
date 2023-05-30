@@ -1,4 +1,4 @@
-ï»¿//GameMode2.cpp
+//GameMode2.cpp
 #include "Game.h"
 #include "GameMode2.h"
 #include <vector>
@@ -15,6 +15,15 @@ vector<SDL_Rect> hold2_dest_rects;
 string nextHoldPath2 = "";
 
 Mode2::Mode2() {
+	//¿Àµð¿À
+	Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 4096);
+	
+	mode2_bgm = Mix_LoadMUS("../../Resources/m2/mode2_bgm.mp3");
+
+	jump_sound = Mix_LoadWAV("../../Resources/m2/jump.wav"); // WAV ÆÄÀÏ ·Îµå
+	btn_sound = Mix_LoadWAV("../../Resources/m2/Button_Sound.wav");
+	mode2_gameover_bgm = Mix_LoadWAV("../../Resources/m2/wrong_hold.wav");
+
 	g_flag_running = true;
 	cur_i = 1;
 	prevHold = 0;
@@ -27,7 +36,7 @@ Mode2::Mode2() {
 	game_over = false;
 	game_ending = false;
 
-	//ï¿½ï¿½Æ®ï¿½ï¿½ Æ©ï¿½ä¸®ï¿½ï¿½
+	//ÀÎÆ®·Î Æ©Åä¸®¾ó
 	SDL_Surface* intro_surface = IMG_Load("../../Resources/m2/intro.png");
 	g_texture_intro = SDL_CreateTextureFromSurface(g_renderer, intro_surface);
 	SDL_FreeSurface(intro_surface);
@@ -35,7 +44,7 @@ Mode2::Mode2() {
 	g_source_rectangle_intro = { 0, 0, 800, 600 };
 	g_destination_rectangle_intro = { 95, 40, 620, 480 };
 
-	//playï¿½ï¿½Æ°
+	//play¹öÆ°
 	SDL_Surface* play_surface = IMG_Load("../../Resources/m2/play.png");
 	g_texture_play = SDL_CreateTextureFromSurface(g_renderer, play_surface);
 	SDL_FreeSurface(play_surface);
@@ -43,50 +52,49 @@ Mode2::Mode2() {
 	g_source_rectangle_play = { 0, 0, 160, 80 };
 	g_destination_rectangle_play = { 320, 510, 160, 80 };
 
-	//ï¿½Ú·Î°ï¿½ï¿½ï¿½
+	//µÚ·Î°¡±â
 	introBack_surface = IMG_Load("../../Resources/m2/back.png");
 	introBack_texture = SDL_CreateTextureFromSurface(g_renderer, introBack_surface);
 	SDL_FreeSurface(introBack_surface);
 	introBack_rect = { 0, 0, introBack_surface->w,introBack_surface->h };
 	introBack_dest_rect = { 10, 10, introBack_surface->w, introBack_surface->h };
 
-	//ï¿½ï¿½ï¿½ï¿½
+	//·¹µð
 	ready_surface = IMG_Load("../../Resources/m2/ready.png");
 	ready_texture = SDL_CreateTextureFromSurface(g_renderer, ready_surface);
 	SDL_FreeSurface(ready_surface);
 	ready_rect = { 0, 0, ready_surface->w,ready_surface->h };
 	ready_dest_rect = { 10, 10, ready_surface->w, ready_surface->h };
 
-	//ï¿½ï¿½Å¸Æ®
+	//½ºÅ¸Æ®
 	start_surface = IMG_Load("../../Resources/m2/start.png");
 	start_texture = SDL_CreateTextureFromSurface(g_renderer, start_surface);
 	SDL_FreeSurface(start_surface);
 	start_rect = { 0, 0, start_surface->w,start_surface->h };
 	start_dest_rect = { 10, 10, start_surface->w, start_surface->h };
 
-	// ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½Îµï¿½
+	// ¹è°æ ÀÌ¹ÌÁö ·Îµå
 	bg_surface = IMG_Load("../../Resources/m2/bg_mode2.png");
-	bg_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface); // GPUï¿½ï¿½ ï¿½Å±ï¿½ï¿½ 
+	bg_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface); // GPU·Î ¿Å±â±â 
 	SDL_FreeSurface(bg_surface);
-	backgroundY = -2400; 	// ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ (È­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
+	backgroundY = -2400; 	// ¹è°æ ÀÌ¹ÌÁö ÃÊ±â À§Ä¡ ¼³Á¤ (È­¸é À§·Î)
 
-	// wall ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½Îµï¿½
+	// wall ÀÌ¹ÌÁö ·Îµå
 	wall_surface = IMG_Load("../../Resources/m2/wall_mode2.png");
-	wall_texture = SDL_CreateTextureFromSurface(g_renderer, wall_surface); // GPUï¿½ï¿½ ï¿½Å±ï¿½ï¿½ 
+	wall_texture = SDL_CreateTextureFromSurface(g_renderer, wall_surface); // GPU·Î ¿Å±â±â 
 	SDL_FreeSurface(wall_surface);
 	wall_rect = { 0, 0, 400, 600 };
 	wall_dest_rect = { 200, 0, 400, 600 };
 
 
-
-	//È¦ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½Îµï¿½
-	srand((unsigned)time(NULL)); // srandï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È£ï¿½ï¿½ï¿½Ø¾ï¿½ ï¿½Õ´Ï´ï¿½.
+	//È¦µå ÀÌ¹ÌÁö ·Îµå
+	srand((unsigned)time(NULL)); // srand´Â ÇÑ ¹ø¸¸ È£ÃâÇØ¾ß ÇÕ´Ï´Ù.
 	for (int i = 0; i < 500; i++) {
 		int random_hold_idx;
 		do {
-			random_hold_idx = rand() % 3; // 0~3 ï¿½ï¿½ ï¿½Ï³ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
-		} while (random_hold_idx == prevHoldIndex); // ï¿½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Îµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Î¿ï¿½ ï¿½Îµï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Õ´Ï´ï¿½
-
+			random_hold_idx = rand() % 3; // 0~3 Áß ÇÏ³ªÀÇ ÀÎµ¦½º¸¦ ¹«ÀÛÀ§·Î ¼±ÅÃ
+		} while (random_hold_idx == prevHoldIndex); // ÇöÀç ÀÎµ¦½º°¡ ÀÌÀü ÀÎµ¦½º¿Í °°À¸¸é »õ·Î¿î ÀÎµ¦½º¸¦ °è¼Ó »ý¼ºÇÕ´Ï´Ù
+		
 		prevHoldIndex = random_hold_idx;
 		string hold_path = hold2_paths[random_hold_idx];
 		SDL_Surface* hold_surface = IMG_Load(hold_path.c_str());
@@ -137,7 +145,7 @@ Mode2::Mode2() {
 	rightUser_dest_rect = { 410, 427, rightUser_surface->w, rightUser_surface->h };
 
 	//ENDING
-	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	//¿£µù»çÁø
 	SDL_Surface* ending_surface = IMG_Load("../../Resources/m2/bg_mode2_ending.png");
 	g_texture_ending = SDL_CreateTextureFromSurface(g_renderer, ending_surface);
 	SDL_FreeSurface(ending_surface);
@@ -145,7 +153,7 @@ Mode2::Mode2() {
 	g_source_rectangle_ending = { 0, 0, 800, 600 };
 	g_destination_rectangle_ending = { 0, 0, 800, 600 };
 
-	//home ï¿½ï¿½Æ°
+	//home ¹öÆ°
 	SDL_Surface* home_surface = IMG_Load("../../Resources/m2/home_btn.png");
 	g_texture_home = SDL_CreateTextureFromSurface(g_renderer, home_surface);
 	SDL_FreeSurface(home_surface);
@@ -182,13 +190,18 @@ Mode2::~Mode2() {
 	SDL_DestroyTexture(g_texture_ending);
 	SDL_DestroyTexture(g_texture_home);
 	SDL_DestroyTexture(g_texture_retry);
+
+	Mix_FreeMusic(mode2_bgm);
+	Mix_FreeChunk(jump_sound);
+	Mix_FreeChunk(btn_sound);
+	Mix_FreeChunk(mode2_gameover_bgm);
 }
 
 void Mode2::Update()
 {
 	Uint32 currentTime = SDL_GetTicks();
 
-	//ï¿½ï¿½ï¿½ï¿½
+	//·¹µð
 	if (ready) {
 		if (currentTime - startTime >= 2000) {
 			startTime = currentTime;
@@ -201,7 +214,7 @@ void Mode2::Update()
 			game_ending = false;
 		}
 	}
-	//ï¿½ï¿½Å¸Æ®
+	//½ºÅ¸Æ®
 	else if (start) {
 		if (currentTime - startTime >= 1000) {
 
@@ -217,8 +230,10 @@ void Mode2::Update()
 	}
 
 	if (game_start && !game_over) {
-		//ï¿½Â´Âµï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+		//¸Â´Âµ¹ ´­·¶À» ¶§
 		if (checkHold()) {
+			Mix_PlayChannel(2, jump_sound, 0); //¹«ÇÑ¹Ýº¹ ¾ÈÇÏ±â
+
 			userMove();
 			holdMove();
 			cur_i++;
@@ -226,7 +241,7 @@ void Mode2::Update()
 			backgroundY += 30;
 			holdCount++;
 
-			if (cur_i >= 50) { //È¦ï¿½ï¿½ 50ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Çµï¿½ ï¿½ï¿½!
+			if (cur_i >= 50) { //È¦µå 50°³ ³ÑÀ¸¸é ½ºÇÇµå ¾÷!
 				gaugeDecreaseRate = gaugeDecreaseRate2;
 			}
 		}
@@ -236,7 +251,7 @@ void Mode2::Update()
 				gauge = 0;
 			}
 		}
-		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ 0ï¿½Ì¸ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+		// °ÔÀÌÁö°¡ 0ÀÌ¸é °ÔÀÓ ¿À¹ö
 		if (gauge == 0) {
 			tutorial = false;
 			ready = false;
@@ -244,7 +259,6 @@ void Mode2::Update()
 			game_start = false;
 			game_over = true;
 			game_ending = false;
-
 		}
 
 		if (checkHold()) {
@@ -256,6 +270,10 @@ void Mode2::Update()
 	}
 
 	if (game_over) {
+		//wav´Â ¿©±â¼­ ÇÃ·¹ÀÌ (¿£µù¿¡¼­¸¸ Àç»ý)
+		Mix_VolumeChunk(mode2_gameover_bgm, MIX_MAX_VOLUME);
+		Mix_PlayChannel(1, mode2_gameover_bgm, 0); //¹«ÇÑ¹Ýº¹ ¾ÈÇÏ±â 
+
 		Uint32 elapsedTime = currentTime - gameoverTime;
 		if (game_over && elapsedTime >= 2000) {
 			tutorial = false;
@@ -273,13 +291,13 @@ void Mode2::Update()
 		game_start = false;
 		game_over = false;
 
-		// ï¿½Ã°ï¿½ï¿½ï¿½ È­ï¿½é¿¡ Ç¥ï¿½ï¿½ï¿½Ï±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½ï¿½ ï¿½ï¿½È¯
+		// ½Ã°£À» È­¸é¿¡ Ç¥½ÃÇÏ±â À§ÇØ ¹®ÀÚ¿­·Î º¯È¯
 		std::string gameTimeString = std::to_string(holdCount);
 
 		SDL_Color black = { 0, 0, 0, 0 };
 		num_surface = TTF_RenderText_Blended(font, gameTimeString.c_str(), black);
 
-		// Ç¥ï¿½ï¿½ï¿½ï¿½ ï¿½Ø½ï¿½Ã³ï¿½ï¿½ ï¿½ï¿½È¯
+		// Ç¥¸éÀ» ÅØ½ºÃ³·Î º¯È¯
 		num_texture = SDL_CreateTextureFromSurface(g_renderer, num_surface);
 		SDL_FreeSurface(num_surface);
 
@@ -292,11 +310,11 @@ void Mode2::Update()
 void Mode2::Render() {
 	SDL_RenderClear(g_renderer);
 
-	//ï¿½ï¿½ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ï¿½ï¿½
+	//¹è°æÀÌ¾îÁö±â
 	SDL_Rect backgroundRect = { 0, backgroundY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT };
 	SDL_RenderCopy(g_renderer, bg_texture, NULL, &backgroundRect);
 
-	//ï¿½ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ï¿½ï¿½
+	//º®ÀÌ¾îÁö±â
 	{
 		int currentY = wall_dest_rect.y + wall_dest_rect.h;
 		while (currentY > -wall_rect.h) {
@@ -309,18 +327,11 @@ void Mode2::Render() {
 			currentY -= wall_rect.h;
 		}
 	}
-	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×¸ï¿½ï¿½ï¿½
-	SDL_Rect gaugeRect = { 615, 20, gauge, 30 }; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
-	SDL_SetRenderDrawColor(g_renderer, 255, 0, 0, 255); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
-	SDL_RenderFillRect(g_renderer, &gaugeRect);
 
-	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×µÎ¸ï¿½ ï¿½×¸ï¿½ï¿½ï¿½
-	SDL_Rect gaugeBorderRect = { 615, 20, 150, 30 }; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×µÎ¸ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
-	SDL_SetRenderDrawColor(g_renderer, 255, 255, 255, 255); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×µÎ¸ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½)
-	int borderWidth = 4; // ï¿½×µÎ¸ï¿½ ï¿½Î²ï¿½ ï¿½ï¿½ï¿½ï¿½
-	for (int i = 0; i < borderWidth; i++) {
-		SDL_Rect borderRect = { gaugeBorderRect.x - i, gaugeBorderRect.y - i, gaugeBorderRect.w + 2 * i, gaugeBorderRect.h + 2 * i };
-		SDL_RenderDrawRect(g_renderer, &borderRect);
+	//ºê±ÝÀº ¿©±â¼­ ÇÃ·¹ÀÌ (Æ©Åä¸®¾ó »óÅÂ¿¡¼­¸¸ Àç»ý)
+	if (!Mix_PlayingMusic()) { //È¨ÀÌ¶û ÇÕÄ¡¸é ´À³¦Ç¥Áö¿ì±â
+		Mix_VolumeMusic(30);
+		Mix_PlayMusic(mode2_bgm, -1); // ¹«ÇÑ¹Ýº¹
 	}
 
 	if (tutorial) {
@@ -340,26 +351,26 @@ void Mode2::Render() {
 		SDL_RenderCopy(g_renderer, start_texture, &start_rect, &start_dest_rect);
 	}
 
-	else if (game_start) {
-		SDL_Rect gaugeRect = { 615, 20, gauge, 30 }; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
-		SDL_SetRenderDrawColor(g_renderer, 255, 0, 0, 255); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½)
+	else if (game_start || game_over) {
+		SDL_Rect gaugeRect = { 615, 20, gauge, 30 }; // °ÔÀÌÁö À§Ä¡¿Í Å©±â ¼³Á¤
+		SDL_SetRenderDrawColor(g_renderer, 255, 0, 0, 255); // °ÔÀÌÁö »ö»ó (»¡°£»ö)
 		SDL_RenderFillRect(g_renderer, &gaugeRect);
 
-		// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×µÎ¸ï¿½ ï¿½×¸ï¿½ï¿½ï¿½
-		SDL_Rect gaugeBorderRect = { 615, 20, 150, 30 }; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×µÎ¸ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ Å©ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
-		SDL_SetRenderDrawColor(g_renderer, 255, 255, 255, 255); // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½×µÎ¸ï¿½ ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½)
-		int borderWidth = 4; // ï¿½×µÎ¸ï¿½ ï¿½Î²ï¿½ ï¿½ï¿½ï¿½ï¿½
+		// °ÔÀÌÁö Å×µÎ¸® ±×¸®±â
+		SDL_Rect gaugeBorderRect = { 615, 20, 150, 30 }; // °ÔÀÌÁö Å×µÎ¸® À§Ä¡¿Í Å©±â ¼³Á¤
+		SDL_SetRenderDrawColor(g_renderer, 255, 255, 255, 255); // °ÔÀÌÁö Å×µÎ¸® »ö»ó (Èò»ö)
+		int borderWidth = 4; // Å×µÎ¸® µÎ²² ¼³Á¤
 		for (int i = 0; i < borderWidth; i++) {
 			SDL_Rect borderRect = { gaugeBorderRect.x - i, gaugeBorderRect.y - i, gaugeBorderRect.w + 2 * i, gaugeBorderRect.h + 2 * i };
 			SDL_RenderDrawRect(g_renderer, &borderRect);
 		}
 
-		//È¦ï¿½ï¿½×¸ï¿½ï¿½ï¿½
+		//È¦µå±×¸®±â
 		for (size_t i = 0; i < hold2_textures.size(); i++) {
 			SDL_RenderCopy(g_renderer, hold2_textures[i], &hold2_rects[i], &hold2_dest_rects[i]);
 		}
 
-		//ï¿½ï¿½ï¿½
+		//»ç¶÷
 		SDL_RenderCopy(g_renderer, leftUser_texture, &leftUser_rect, &leftUser_dest_rect);
 	}
 	else if (game_ending) {
@@ -367,28 +378,30 @@ void Mode2::Render() {
 		SDL_RenderCopy(g_renderer, g_texture_home, &g_source_rectangle_home, &g_destination_rectangle_home);
 		SDL_RenderCopy(g_renderer, g_texture_retry, &g_source_rectangle_retry, &g_destination_rectangle_retry);
 
-		// È¦ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+		// È¦µå °³¼ö Ãâ·Â
 		SDL_RenderCopy(g_renderer, num_texture, NULL, &num_rect);
+
 	}
-	SDL_RenderPresent(g_renderer);
+		SDL_RenderPresent(g_renderer);
 }
 
 
 void Mode2::userMove() {
-	//ï¿½ï¿½ï¿½ ï¿½Æ·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ì±ï¿½
+	//¹è°æ ¾Æ·¡·Î ¿òÁ÷ÀÌ±â
 	wall_dest_rect.y += 20;
 
-	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù²Ù±ï¿½
+	//¿ÞÂÊÀ¯ÀúÀÏ¶§ ¿À¸¥ÂÊÀ¯Àú·Î ¹Ù²Ù±â
 	if (isLeftUser) {
 		leftUser_dest_rect.x += 150;
 		rightUser_dest_rect.x -= 150;
+		
 	}
-	//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï¶ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ù²Ù±ï¿½
+	//¿À¸¥ÂÊÀ¯ÀúÀÏ¶§ ¿ÞÂÊÀ¯Àú·Î ¹Ù²Ù±â
 	else {
 		leftUser_dest_rect.x -= 150;
 		rightUser_dest_rect.x += 150;
+		
 	}
-
 	SDL_Surface* tempSurface = leftUser_surface;
 	leftUser_surface = rightUser_surface;
 	rightUser_surface = rightUser_surface;
@@ -398,6 +411,7 @@ void Mode2::userMove() {
 	rightUser_texture = tempTexture;
 
 	isLeftUser = !isLeftUser;
+	
 }
 
 void Mode2::holdMove() {
@@ -412,7 +426,7 @@ bool Mode2::checkHold() {
 		return true;
 	}
 	else {
-		prevHold = 0; // holdï¿½ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ prevHold ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­ï¿½Õ´Ï´ï¿½.
+		prevHold = 0; // hold°¡ ÀÏÄ¡ÇÏÁö ¾ÊÀ¸¸é prevHold °ªÀ» ÃÊ±âÈ­ÇÕ´Ï´Ù.
 	}
 	return false;
 }
@@ -427,16 +441,15 @@ void Mode2::HandleEvents() {
 			break;
 
 		case SDL_MOUSEBUTTONDOWN:
-
 			// If the mouse left button is pressed. 
 			if (event.button.button == SDL_BUTTON_LEFT)
 			{
 				int mouseX = event.button.x;
 				int mouseY = event.button.y;
-				//ï¿½Ú·Î°ï¿½ï¿½ï¿½(homeï¿½ï¿½ï¿½ï¿½) ï¿½ï¿½ï¿½ß¿ï¿½ ï¿½ï¿½Ä¡ï¿½ï¿½!!!!!
+				//µÚ·Î°¡±â(homeÀ¸·Î)
 				if (mouseX >= introBack_rect.x && mouseX < introBack_dest_rect.x + introBack_dest_rect.w
 					&& mouseY >= introBack_dest_rect.y && mouseY < introBack_dest_rect.y + introBack_dest_rect.h
-					&& g_current_game_phase == PHASE_MODE2) {
+					&& g_current_game_phase == PHASE_MODE2 && tutorial == true){
 					g_current_game_phase = PHASE_HOME;
 					tutorial = true;
 					ready = false;
@@ -444,12 +457,19 @@ void Mode2::HandleEvents() {
 					game_start = false;
 					game_over = false;
 					game_ending = false;
+					Mix_FadeOutMusic(1000);
+
+					//wavÀº ¿©±â¼­ ÇÃ·¹ÀÌ
+					Mix_VolumeChunk(btn_sound, MIX_MAX_VOLUME);
+					Mix_PlayChannel(3, btn_sound, 0); //¹«ÇÑ¹Ýº¹ ¾ÈÇÏ±â
 				}
 
 				//game start
-				if (mouseX >= start_dest_rect.x && mouseX < start_dest_rect.x + start_dest_rect.w
-					&& mouseY >= start_dest_rect.y && mouseY < start_dest_rect.y + start_dest_rect.h
-					&& g_current_game_phase == PHASE_MODE2 && tutorial == true) {
+				if (mouseX >= g_destination_rectangle_play.x && 
+					mouseX < g_destination_rectangle_play.x + g_destination_rectangle_play.w &&
+					mouseY >= g_destination_rectangle_play.y &&
+					mouseY < g_destination_rectangle_play.y + g_destination_rectangle_play.h
+					&& g_current_game_phase == PHASE_MODE2 && tutorial) {
 					tutorial = false;
 					ready = true;
 					start = false;
@@ -457,38 +477,52 @@ void Mode2::HandleEvents() {
 					game_over = false;
 					game_ending = false;
 					startTime = SDL_GetTicks();
+
+					//wavÀº ¿©±â¼­ ÇÃ·¹ÀÌ
+					Mix_VolumeChunk(btn_sound, MIX_MAX_VOLUME);
+					Mix_PlayChannel(3, btn_sound, 0); //¹«ÇÑ¹Ýº¹ ¾ÈÇÏ±â
+					
 				}
 				// retry
 				if (
 					mouseX >= g_destination_rectangle_retry.x &&
 					mouseX <= g_destination_rectangle_retry.x + g_destination_rectangle_retry.w &&
 					mouseY >= g_destination_rectangle_retry.y &&
-					mouseY <= g_destination_rectangle_retry.y + g_destination_rectangle_retry.h) {
+					mouseY <= g_destination_rectangle_retry.y + g_destination_rectangle_retry.h && game_ending) {
+					ResetGame();
 					tutorial = true;
 					ready = false;
 					start = false;
 					game_start = false;
 					game_over = false;
 					game_ending = false;
-					ResetGame();
+
+					//wavÀº ¿©±â¼­ ÇÃ·¹ÀÌ
+					Mix_VolumeChunk(btn_sound, MIX_MAX_VOLUME);
+					Mix_PlayChannel(3, btn_sound, 0); //¹«ÇÑ¹Ýº¹ ¾ÈÇÏ±â
 				}
 
-				// home ï¿½ï¿½Æ°
+				// home ¹öÆ°
 				if (mouseX >= g_destination_rectangle_home.x &&
 					mouseX <= g_destination_rectangle_home.x + g_destination_rectangle_home.w &&
 					mouseY >= g_destination_rectangle_home.y &&
-					mouseY <= g_destination_rectangle_home.y + g_destination_rectangle_home.h) {
+					mouseY <= g_destination_rectangle_home.y + g_destination_rectangle_home.h && game_ending) {
 					g_current_game_phase = PHASE_HOME;
+					ResetGame();
 					tutorial = true;
 					ready = false;
 					start = false;
 					game_start = false;
 					game_over = false;
 					game_ending = false;
-					ResetGame();
+					Mix_FadeOutMusic(1000);
+
+					//wavÀº ¿©±â¼­ ÇÃ·¹ÀÌ
+					Mix_VolumeChunk(btn_sound, MIX_MAX_VOLUME);
+					Mix_PlayChannel(3, btn_sound, 0); //¹«ÇÑ¹Ýº¹ ¾ÈÇÏ±â
 				}
 			}
-			break;
+				break;
 
 		case SDL_KEYDOWN:
 			if (!tutorial && !ready && !start && event.key.keysym.sym)
@@ -502,21 +536,21 @@ void Mode2::HandleEvents() {
 				}
 				else if (event.key.keysym.sym == SDLK_g) {
 					f_state = 2;
-					gauge += 10; // ï¿½ï¿½Æ°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å´
+					gauge += 10; // ¹öÆ°À» ´©¸¦ ¶§ °ÔÀÌÁö¸¦ Áõ°¡½ÃÅ´
 					if (gauge > 100) {
 						gauge = 100;
 					}
 				}
 				else if (event.key.keysym.sym == SDLK_b) {
 					f_state = 3;
-					gauge += 10; // ï¿½ï¿½Æ°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Å´
+					gauge += 10; // ¹öÆ°À» ´©¸¦ ¶§ °ÔÀÌÁö¸¦ Áõ°¡½ÃÅ´
 					if (gauge > 100) {
 						gauge = 100;
 					}
 				}
-				//Æ²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ó¿ï¿½ï¿½ï¿½
+				//Æ²·ÈÀ»¶§ °ÔÀÓ¿À¹ö
 				if (f_state != hold[cur_i]) {
-					SDL_Delay(2000); //ï¿½Â´ï¿½ È¿ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½!!
+					SDL_Delay(2000); //¸Â´Â È¿°úÀ½ ³ÖÀ¸¸é ¤¡¤ºÀ»µí!!
 					tutorial = false;
 					ready = false;
 					start = false;
@@ -528,45 +562,53 @@ void Mode2::HandleEvents() {
 
 		case SDL_KEYUP:
 			if (event.key.keysym.sym == SDLK_DOWN) {
-				// ï¿½Æ·ï¿½ Å°ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ f_state ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­ï¿½Õ´Ï´ï¿½.
+				// ¾Æ·¡ Å°¸¦ ¶¼¸é f_state °ªÀ» ÃÊ±âÈ­ÇÕ´Ï´Ù.
 				f_state = 0;
 			}
 			}
 			break;
 		default:
 			break;
+			}
 		}
 	}
-}
 
-void Mode2::ResetGame() {
-	f_state = 0;
-	cur_i = 1;
-	prevHold = 0;
-	gauge = 150;
-	holdCount = 0;
+	void Mode2::ResetGame() {
+		userMove();
+		f_state = 0;
+		cur_i = 1;
+		prevHold = 0;
+		gauge = 150;
+		holdCount = 0;
+		gaugeDecreaseRate = 1;
 
-	backgroundY = -2400;
 
-	userMove();
-	//isLeftUser = !isLeftUser;
-	leftUser_dest_rect.x = 280;
-	rightUser_dest_rect.x = 410;
-	//leftUser_dest_rect = { 280, 427, leftUser_surface->w, leftUser_surface->h };
-	//rightUser_dest_rect = { 410, 427, rightUser_surface->w, rightUser_surface->h };
+		backgroundY = -2400;
 
-	// Reset hold positions
-	leftHoldY = 475;
-	rightHoldY = 375;
-	for (size_t i = 0; i < hold2_dest_rects.size(); i++) {
-		if (i % 2 == 0) {
-			hold2_dest_rects[i].y = leftHoldY;
-			leftHoldY -= 200;
+		if (!isLeftUser) {
+			isLeftUser = !isLeftUser;
 		}
 		else {
-			hold2_dest_rects[i].y = rightHoldY;
-			rightHoldY -= 200;
+			isLeftUser = isLeftUser;
 		}
-	}
+		
+		leftUser_dest_rect.x = 280;
+		rightUser_dest_rect.x = 410;
+		//leftUser_dest_rect = { 280, 427, leftUser_surface->w, leftUser_surface->h };
+		//rightUser_dest_rect = { 410, 427, rightUser_surface->w, rightUser_surface->h };
 
-}
+		// Reset hold positions
+		leftHoldY = 475;
+		rightHoldY = 375;
+		for (size_t i = 0; i < hold2_dest_rects.size(); i++) {
+			if (i % 2 == 0) {
+				hold2_dest_rects[i].y = leftHoldY;
+				leftHoldY -= 200;
+			}
+			else {
+				hold2_dest_rects[i].y = rightHoldY;
+				rightHoldY -= 200;
+			}
+		}
+
+	}
