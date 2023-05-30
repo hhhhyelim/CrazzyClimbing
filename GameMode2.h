@@ -20,12 +20,11 @@ private:
 	Mix_Chunk* jump_sound; // WAV 파일 로드
 	Mix_Chunk* btn_sound;
 	Mix_Chunk* mode2_gameover_bgm;
-
-	Mix_Chunk* readySound_wav;
+	Mix_Chunk* ready_sound;
 
 	int cur_i;
 	int prevHold;
-
+	
 	Uint32 startTime = 0;
 	Uint32 gameoverTime = 0;
 

@@ -37,7 +37,7 @@ private:
 
 	//BackGround
 
- // 배경 이미지 크기
+  // 배경 이미지 크기
 	const int BACKGROUND_WIDTH = 800;
 	const int BACKGROUND_HEIGHT = 3000;
 	// bg
@@ -47,7 +47,7 @@ private:
 	SDL_Rect bg_dest_rect;
 	int backgroundY; // 배경 이미지의 Y 좌표
 
- // 게임 창 크기
+  // 게임 창 크기
 	const int WINDOW_WIDTH = 800;
 	const int WINDOW_HEIGHT = 600;
 

@@ -521,9 +521,9 @@ void Mode3::Render() {
 
     }
     else if (game_over) {
-        
+
     }
-    
+
     else if (game_ending) {
 
         if (result == 1) {
@@ -569,7 +569,7 @@ void Mode3::HandleEvents() {
                     && mouseY >= destination_rectangle_bb.y && mouseY < destination_rectangle_bb.y + destination_rectangle_bb.h
                     && g_current_game_phase == PHASE_MODE3) {
                     Mix_PlayChannel(-1, btn_wav, 0);
-                    
+
                     g_current_game_phase = PHASE_HOME;
                     tutorial = true;
                     ready = false;
@@ -586,7 +586,7 @@ void Mode3::HandleEvents() {
                     && g_current_game_phase == PHASE_MODE3) {
                     Mix_VolumeChunk(btn_wav, MIX_MAX_VOLUME);
                     Mix_PlayChannel(-1, btn_wav, 0);
-                    
+
                     g_current_game_phase = PHASE_HOME;
                     tutorial = true;
                     ready = false;
@@ -603,7 +603,7 @@ void Mode3::HandleEvents() {
                     && g_current_game_phase == PHASE_MODE3) {
                     Mix_VolumeChunk(btn_wav, MIX_MAX_VOLUME);
                     Mix_PlayChannel(-1, btn_wav, 0);
-                    
+
                     tutorial = true;
                     ready = false;
                     start = false;
@@ -620,7 +620,7 @@ void Mode3::HandleEvents() {
                     Mix_PlayChannel(-1, btn_wav, 0);
                     Mix_VolumeChunk(readySound_wav, MIX_MAX_VOLUME);
                     Mix_PlayChannel(-1, readySound_wav, 0);
-                    
+
                     tutorial = false;
                     ready = true;
                     start = false;

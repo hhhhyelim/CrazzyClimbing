@@ -82,7 +82,7 @@ private:
 	SDL_Texture* time_texture;
 	SDL_Rect time_rect;
 
-	
+
 	TTF_Font* font2;
 	SDL_Surface* time2_surface;
 	SDL_Texture* time2_texture;
@@ -132,15 +132,14 @@ private:
 	Mix_Chunk* btn_wav;
 	// game clear wav
 	Mix_Chunk* gameClear_wav;
-	// ready sound wav
-	Mix_Chunk* readySound_wav;
-	
+	//readyStart
+	Mix_Chunk* ready_sound;
 
 
 	int hold[41]; // 1:down 2:left 3: right 4: up
 	int f_state; // 1:down 2:left 3: right 4: up
 	bool isLeftUser = true;
-	
+
 	int prevHoldIndex = -1;
 
 	Uint32 startTime = 0;

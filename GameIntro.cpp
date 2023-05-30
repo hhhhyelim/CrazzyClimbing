@@ -17,7 +17,7 @@ Intro::Intro() {
 
     Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 4096);
     // intro bgm
-    Mix_Music* intro_mus = Mix_LoadMUS("../../Resources/introBgm.mp3");
+    Mix_Music* intro_mus = Mix_LoadMUS("../../Resources/introBgm.mp3");;
     Mix_VolumeMusic(100); // 배경 음악 소리 볼륨
 
     Mix_FadeInMusic(intro_mus, -1, 2); // 소리 서서히 커지게

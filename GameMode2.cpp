@@ -17,13 +17,11 @@ string nextHoldPath2 = "";
 Mode2::Mode2() {
 	//오디오
 	Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 4096);
-
-	mode2_bgm = Mix_LoadMUS("../../Resources/m2/mode2_bgm.mp3");
-
+	mode2_bgm = Mix_LoadMUS("../../Resources/m2/mode2_bgm.mp3"); //mp3
 	jump_sound = Mix_LoadWAV("../../Resources/m2/jump.wav"); // WAV 파일 로드
 	btn_sound = Mix_LoadWAV("../../Resources/m2/Button_Sound.wav");
 	mode2_gameover_bgm = Mix_LoadWAV("../../Resources/m2/wrong_hold.wav");
-	readySound_wav = Mix_LoadWAV("../../Resources/m1/readySound.wav");
+	ready_sound = Mix_LoadWAV("../../Resources/m2/readySound.wav");
 
 	g_flag_running = true;
 	cur_i = 1;
@@ -95,7 +93,7 @@ Mode2::Mode2() {
 		do {
 			random_hold_idx = rand() % 3; // 0~3 중 하나의 인덱스를 무작위로 선택
 		} while (random_hold_idx == prevHoldIndex); // 현재 인덱스가 이전 인덱스와 같으면 새로운 인덱스를 계속 생성합니다
-
+		
 		prevHoldIndex = random_hold_idx;
 		string hold_path = hold2_paths[random_hold_idx];
 		SDL_Surface* hold_surface = IMG_Load(hold_path.c_str());
@@ -191,6 +189,8 @@ Mode2::~Mode2() {
 	SDL_DestroyTexture(g_texture_ending);
 	SDL_DestroyTexture(g_texture_home);
 	SDL_DestroyTexture(g_texture_retry);
+
+	TTF_CloseFont(font);
 
 	Mix_FreeMusic(mode2_bgm);
 	Mix_FreeChunk(jump_sound);
@@ -309,7 +309,6 @@ void Mode2::Update()
 }
 
 void Mode2::Render() {
-	SDL_RenderClear(g_renderer);
 
 	//배경이어지기
 	SDL_Rect backgroundRect = { 0, backgroundY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT };
@@ -331,7 +330,7 @@ void Mode2::Render() {
 
 	//브금은 여기서 플레이 (튜토리얼 상태에서만 재생)
 	if (!Mix_PlayingMusic()) { //홈이랑 합치면 느낌표지우기
-		Mix_VolumeMusic(30);
+		Mix_VolumeMusic(100);
 		Mix_PlayMusic(mode2_bgm, -1); // 무한반복
 	}
 
@@ -342,10 +341,13 @@ void Mode2::Render() {
 		SDL_RenderCopy(g_renderer, g_texture_play, &g_source_rectangle_play, &g_destination_rectangle_play);
 		// Back Button
 		SDL_RenderCopy(g_renderer, introBack_texture, &introBack_rect, &introBack_dest_rect);
+
+
 	}
 
 	else if (ready) {
-		SDL_RenderCopy(g_renderer, ready_texture, &ready_rect, &ready_dest_rect);
+		SDL_RenderCopy(g_renderer, ready_texture, &ready_rect, &ready_dest_rect); 
+	
 	}
 
 	else if (start) {
@@ -383,7 +385,7 @@ void Mode2::Render() {
 		SDL_RenderCopy(g_renderer, num_texture, NULL, &num_rect);
 
 	}
-	SDL_RenderPresent(g_renderer);
+		SDL_RenderPresent(g_renderer);
 }
 
 
@@ -395,13 +397,13 @@ void Mode2::userMove() {
 	if (isLeftUser) {
 		leftUser_dest_rect.x += 150;
 		rightUser_dest_rect.x -= 150;
-
+		
 	}
 	//오른쪽유저일때 왼쪽유저로 바꾸기
 	else {
 		leftUser_dest_rect.x -= 150;
 		rightUser_dest_rect.x += 150;
-
+		
 	}
 	SDL_Surface* tempSurface = leftUser_surface;
 	leftUser_surface = rightUser_surface;
@@ -412,7 +414,7 @@ void Mode2::userMove() {
 	rightUser_texture = tempTexture;
 
 	isLeftUser = !isLeftUser;
-
+	
 }
 
 void Mode2::holdMove() {
@@ -450,7 +452,7 @@ void Mode2::HandleEvents() {
 				//뒤로가기(home으로)
 				if (mouseX >= introBack_rect.x && mouseX < introBack_dest_rect.x + introBack_dest_rect.w
 					&& mouseY >= introBack_dest_rect.y && mouseY < introBack_dest_rect.y + introBack_dest_rect.h
-					&& g_current_game_phase == PHASE_MODE2 && tutorial == true) {
+					&& g_current_game_phase == PHASE_MODE2 && tutorial == true){
 					g_current_game_phase = PHASE_HOME;
 					tutorial = true;
 					ready = false;
@@ -466,7 +468,7 @@ void Mode2::HandleEvents() {
 				}
 
 				//game start
-				if (mouseX >= g_destination_rectangle_play.x &&
+				if (mouseX >= g_destination_rectangle_play.x && 
 					mouseX < g_destination_rectangle_play.x + g_destination_rectangle_play.w &&
 					mouseY >= g_destination_rectangle_play.y &&
 					mouseY < g_destination_rectangle_play.y + g_destination_rectangle_play.h
@@ -478,12 +480,15 @@ void Mode2::HandleEvents() {
 					game_over = false;
 					game_ending = false;
 					startTime = SDL_GetTicks();
-					Mix_VolumeChunk(readySound_wav, MIX_MAX_VOLUME);
-					Mix_PlayChannel(-1, readySound_wav, 0);
+
 					//wav은 여기서 플레이
 					Mix_VolumeChunk(btn_sound, MIX_MAX_VOLUME);
 					Mix_PlayChannel(3, btn_sound, 0); //무한반복 안하기
 
+					//wav는 여기서 플레이
+					Mix_VolumeChunk(ready_sound, MIX_MAX_VOLUME);
+					Mix_PlayChannel(1, ready_sound, 0); //무한반복 안하기
+					
 				}
 				// retry
 				if (
@@ -524,7 +529,7 @@ void Mode2::HandleEvents() {
 					Mix_PlayChannel(3, btn_sound, 0); //무한반복 안하기
 				}
 			}
-			break;
+				break;
 
 		case SDL_KEYDOWN:
 			if (!tutorial && !ready && !start && event.key.keysym.sym)
@@ -571,46 +576,45 @@ void Mode2::HandleEvents() {
 			break;
 		default:
 			break;
+			}
 		}
 	}
-}
 
-void Mode2::ResetGame() {
-	userMove();
-	f_state = 0;
-	cur_i = 1;
-	prevHold = 0;
-	gauge = 150;
-	holdCount = 0;
-	gaugeDecreaseRate = 1;
+	void Mode2::ResetGame() {
+		userMove();
+		f_state = 0;
+		cur_i = 1;
+		prevHold = 0;
+		gauge = 150;
+		holdCount = 0;
+		gaugeDecreaseRate = 1;
 
+		backgroundY = -2400;
 
-	backgroundY = -2400;
-
-	if (!isLeftUser) {
-		isLeftUser = !isLeftUser;
-	}
-	else {
-		isLeftUser = isLeftUser;
-	}
-
-	leftUser_dest_rect.x = 280;
-	rightUser_dest_rect.x = 410;
-	//leftUser_dest_rect = { 280, 427, leftUser_surface->w, leftUser_surface->h };
-	//rightUser_dest_rect = { 410, 427, rightUser_surface->w, rightUser_surface->h };
-
-	// Reset hold positions
-	leftHoldY = 475;
-	rightHoldY = 375;
-	for (size_t i = 0; i < hold2_dest_rects.size(); i++) {
-		if (i % 2 == 0) {
-			hold2_dest_rects[i].y = leftHoldY;
-			leftHoldY -= 200;
+		if (!isLeftUser) {
+			isLeftUser = !isLeftUser;
 		}
 		else {
-			hold2_dest_rects[i].y = rightHoldY;
-			rightHoldY -= 200;
+			isLeftUser = isLeftUser;
+		}
+		
+		leftUser_dest_rect.x = 280;
+		rightUser_dest_rect.x = 410;
+		//leftUser_dest_rect = { 280, 427, leftUser_surface->w, leftUser_surface->h };
+		//rightUser_dest_rect = { 410, 427, rightUser_surface->w, rightUser_surface->h };
+
+		// Reset hold positions
+		leftHoldY = 475;
+		rightHoldY = 375;
+
+		for (size_t i = 0; i < hold2_dest_rects.size(); i++) {
+			if (i % 2 == 0) {
+				hold2_dest_rects[i].y = leftHoldY;
+				leftHoldY -= 200;
+			}
+			else {
+				hold2_dest_rects[i].y = rightHoldY;
+				rightHoldY -= 200;
+			}
 		}
 	}
-
-}

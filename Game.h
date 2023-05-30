@@ -1,8 +1,6 @@
 #pragma once
 
-
 #include <iostream>
-#include <atlstr.h>
 #include <string>
 #include "SDL.h" 
 #include "SDL_ttf.h"
@@ -15,9 +13,6 @@ const int PHASE_HOME = 1;
 const int PHASE_MODE1 = 2;
 const int PHASE_MODE2 = 3;
 const int PHASE_MODE3 = 4;
-const int PHASE_ENDING1 = 5;
-const int PHASE_ENDING2 = 6;
-const int PHASE_ENDING3 = 7;
 
 void InitGame();
 void ClearGame();
@@ -26,7 +21,6 @@ extern int g_current_game_phase;
 extern bool g_flag_running;
 extern SDL_Renderer* g_renderer;
 extern SDL_Window* g_window;
-
 
 class PhaseInterface
 {
