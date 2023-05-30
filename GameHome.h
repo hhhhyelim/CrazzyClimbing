@@ -13,6 +13,7 @@ public:
 
 private:
 	Mix_Chunk* btn_sound;
+	Mix_Music* home_bgm;
 
 	//Background
 	SDL_Rect g_bg_source_rect;
