@@ -132,6 +132,9 @@ private:
 	Mix_Chunk* btn_wav;
 	// game clear wav
 	Mix_Chunk* gameClear_wav;
+	// ready sound wav
+	Mix_Chunk* readySound_wav;
+	
 
 
 	int hold[41]; // 1:down 2:left 3: right 4: up

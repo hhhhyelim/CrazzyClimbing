@@ -33,11 +33,11 @@ private:
 	//캐릭터
 	SDL_Rect g_ch_source_rect;
 	SDL_Rect g_ch_destination_rect;
-	
+
 
 	//BackGround
 
-// 배경 이미지 크기
+ // 배경 이미지 크기
 	const int BACKGROUND_WIDTH = 800;
 	const int BACKGROUND_HEIGHT = 3000;
 	// bg
@@ -47,7 +47,7 @@ private:
 	SDL_Rect bg_dest_rect;
 	int backgroundY; // 배경 이미지의 Y 좌표
 
-// 게임 창 크기
+ // 게임 창 크기
 	const int WINDOW_WIDTH = 800;
 	const int WINDOW_HEIGHT = 600;
 
@@ -85,10 +85,10 @@ private:
 	SDL_Texture* texture_start;
 	SDL_Rect source_rectangle_start;
 	SDL_Rect destination_rectangle_start;
-	
+
 
 	// game_ending
-	
+
 	// finish
 	SDL_Texture* texture_finish;
 	SDL_Rect source_rectangle_finish;
@@ -136,8 +136,6 @@ private:
 	int chY = CH_START_Y;
 
 
-
-
 	// 돌 크기
 	const int STONE_WIDTH = 64;
 	const int STONE_HEIGHT = 64;
@@ -145,7 +143,6 @@ private:
 	// 돌 이미지 출력 개수
 	const int NUM_STONES = 5;
 
-	
 
 	// 돌 이미지 위치
 	const int STONE_X = 370; // 돌의 X 좌표
@@ -155,15 +152,8 @@ private:
 	Uint32 gameoverTime = 0;
 
 
-	
-
-
-
 	std::vector<int> stoneNumbers; // 숫자 저장용 배열
 	int stonesOnScreen; // 화면에 출력되는 돌의 개수
-
-
-
 
 
 	// 플레이어가 돌을 누른 시간 기록
@@ -178,5 +168,18 @@ private:
 	SDL_Rect monkeyRect;
 	int monkeyFrame = 0;
 	int monkeyTimer = 0;
-};
 
+	// 배경 음악
+	Mix_Music* bg_mus;
+	// jump wav
+	Mix_Chunk* jump_wav;
+	// btn
+	Mix_Chunk* btn_wav;
+	// game clear wav
+	Mix_Chunk* gameClear_wav;
+	// game clear wav
+	Mix_Chunk* gameOver_wav;
+	// ready sound wav
+	Mix_Chunk* readySound_wav;
+
+};

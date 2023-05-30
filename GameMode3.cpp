@@ -12,8 +12,25 @@ int currentNumber = randomDistribution(randomEngine); // 랜덤 값으로 초기화
 
 
 Mode3::Mode3() {
+    // 배경 음악
+    Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 4096);
+    bg_mus = Mix_LoadMUS("../../Resources/m3/mode3Bgm.mp3");
 
-  
+    // jump wav
+    jump_wav = Mix_LoadWAV("../../Resources/m3/jump.wav");
+
+    // btn wav
+    btn_wav = Mix_LoadWAV("../../Resources/m3/btnSound.wav");
+
+    // game clear wav
+    gameClear_wav = Mix_LoadWAV("../../Resources/m3/gameClear.wav");
+    // game over wav
+    gameOver_wav = Mix_LoadWAV("../../Resources/m3/gameOver.wav");
+
+    // ready sound wav
+    readySound_wav = Mix_LoadWAV("../../Resources/m3/readySound.wav");
+
+
     //STATE
     tutorial = true;
     ready = false;
@@ -86,7 +103,7 @@ Mode3::Mode3() {
         }
     }
 
-  
+
 
     //Tutorial
     {
@@ -110,7 +127,7 @@ Mode3::Mode3() {
     bg_surface = IMG_Load("../../Resources/m3/Mode3_bg_all.png");
     bg_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface); // GPU로 옮기기 
     SDL_FreeSurface(bg_surface);
-    backgroundY = -2400; 	// 배경 이미지 초기 위치 설정 (화면 위로)
+    backgroundY = -2400;    // 배경 이미지 초기 위치 설정 (화면 위로)
 
     //wall
     {
@@ -191,7 +208,7 @@ Mode3::Mode3() {
         SDL_QueryTexture(texture_ready, NULL, NULL, &source_rectangle_ready.w, &source_rectangle_ready.h);
         source_rectangle_ready = { 0, 0, temp_surface->w, temp_surface->h };
         destination_rectangle_ready = { 20, 20, temp_surface->w, temp_surface->h };
-       
+
     }
 
     // Start
@@ -200,8 +217,8 @@ Mode3::Mode3() {
         texture_start = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
         SDL_FreeSurface(temp_surface);
         SDL_QueryTexture(texture_start, NULL, NULL, &source_rectangle_start.w, &source_rectangle_start.h);
-        source_rectangle_start = {0, 0, temp_surface->w, temp_surface->h };
-        destination_rectangle_start = {20, 20, temp_surface->w, temp_surface->h };
+        source_rectangle_start = { 0, 0, temp_surface->w, temp_surface->h };
+        destination_rectangle_start = { 20, 20, temp_surface->w, temp_surface->h };
 
     }
 
@@ -296,6 +313,14 @@ Mode3::~Mode3() {
     SDL_DestroyTexture(texture_gameover);
     SDL_DestroyTexture(texture_hb);
     SDL_DestroyTexture(texture_rb);
+
+    Mix_FreeMusic(bg_mus);
+    Mix_FreeChunk(jump_wav);
+    Mix_FreeChunk(btn_wav);
+    Mix_FreeChunk(gameClear_wav);
+    Mix_FreeChunk(gameOver_wav);
+    Mix_FreeChunk(readySound_wav);
+
 }
 
 void Mode3::Update()
@@ -304,7 +329,7 @@ void Mode3::Update()
 
     // Ready, Start
     if (ready) {
-        if (currentTime - startTime >= 2000) {
+        if (currentTime - startTime >= 1000) {
             startTime = currentTime;
             tutorial = false;
             ready = false;
@@ -313,12 +338,12 @@ void Mode3::Update()
             game_over = false;
             game_ending = false;
 
-            
+
         }
     }
     else if (start) {
         if (currentTime - startTime >= 1000) {
-       
+
             startTime = currentTime;
 
             tutorial = false;
@@ -329,7 +354,7 @@ void Mode3::Update()
             game_ending = false;
         }
     }
-   
+
 
     // game_start
     if (game_start && !game_over) {
@@ -350,7 +375,7 @@ void Mode3::Update()
         {
             gameoverTime = SDL_GetTicks();
             monkeyFrame = 2; // 원숭이 잡힌 경우 monkey3.png로 변경
-           
+
             result = 2;
             tutorial = false;
             ready = false;
@@ -362,15 +387,17 @@ void Mode3::Update()
 
     }
 
-    // game_over
+    // game_over 
     if (game_over) {
         if (result == 2) {
+            Mix_PlayChannel(-1, gameClear_wav, 0);
             monkeyY += 5;
         }
         else if (result == 1) {
+            Mix_PlayChannel(-1, gameOver_wav, 0);
             chY += 5;
         }
-       
+
         // 현재 시간과 충돌 감지 시간 간의 차이 계산
         Uint32 elapsedTime = currentTime - gameoverTime;
 
@@ -394,9 +421,11 @@ void Mode3::Update()
     }
 
     if (correct_button == true) {
+        Mix_VolumeChunk(jump_wav, MIX_MAX_VOLUME);
+        Mix_PlayChannel(-1, jump_wav, 0);
         correct_button = false;
         backgroundY += 30;
-       
+
         monkeyY -= velocityY;
     }
 
@@ -411,13 +440,19 @@ void Mode3::Update()
 }
 
 void Mode3::Render() {
-
-
     SDL_RenderClear(g_renderer);
 
     //배경이어지기
     SDL_Rect backgroundRect = { 0, backgroundY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT };
     SDL_RenderCopy(g_renderer, bg_texture, NULL, &backgroundRect);
+
+
+    //bgm
+    if (!Mix_PlayingMusic()) {
+
+        Mix_PlayMusic(bg_mus, -1);
+        Mix_VolumeMusic(100); // 배경 음악 소리 볼륨
+    }
 
     // Wall
     {
@@ -435,7 +470,7 @@ void Mode3::Render() {
     }
 
 
-   
+
     if (tutorial) {
         //Tutorial
         SDL_RenderCopy(g_renderer, g_tt_texture, &g_tt_source_rect, &g_tt_destination_rect);
@@ -465,7 +500,7 @@ void Mode3::Render() {
             tmp_r.h = chRect.h;
             SDL_RenderCopy(g_renderer, chTextures[currentCharacterIndex], nullptr, &chRect);
         }
-       
+
         //원숭이
         {
             monkeyRect.y = monkeyY; // 원숭이의 Y 좌표 업데이트
@@ -483,13 +518,14 @@ void Mode3::Render() {
             SDL_Rect stoneRect = { STONE_X, STONE_Y - (STONE_SPACING * i), STONE_WIDTH, STONE_HEIGHT };
             SDL_RenderCopy(g_renderer, stoneTextures[stoneNumber - 1], nullptr, &stoneRect);
         }
-        
-    }
-    else if (game_over) {
 
     }
-    else if (game_ending) {
+    else if (game_over) {
         
+    }
+    
+    else if (game_ending) {
+
         if (result == 1) {
             SDL_RenderCopy(g_renderer, texture_gameover, &source_rectangle_gameover, &destination_rectangle_gameover);
         }
@@ -532,6 +568,8 @@ void Mode3::HandleEvents() {
                 if (mouseX >= destination_rectangle_bb.x && mouseX < destination_rectangle_bb.x + destination_rectangle_bb.w
                     && mouseY >= destination_rectangle_bb.y && mouseY < destination_rectangle_bb.y + destination_rectangle_bb.h
                     && g_current_game_phase == PHASE_MODE3) {
+                    Mix_PlayChannel(-1, btn_wav, 0);
+                    
                     g_current_game_phase = PHASE_HOME;
                     tutorial = true;
                     ready = false;
@@ -540,11 +578,15 @@ void Mode3::HandleEvents() {
                     game_over = false;
                     game_ending = false;
                     ResetGame();
+                    Mix_FadeOutMusic(1000);
                 }
                 //뒤로가기(home으로)
                 if (mouseX >= destination_rectangle_hb.x && mouseX < destination_rectangle_hb.x + destination_rectangle_hb.w
                     && mouseY >= destination_rectangle_hb.y && mouseY < destination_rectangle_hb.y + destination_rectangle_hb.h
                     && g_current_game_phase == PHASE_MODE3) {
+                    Mix_VolumeChunk(btn_wav, MIX_MAX_VOLUME);
+                    Mix_PlayChannel(-1, btn_wav, 0);
+                    
                     g_current_game_phase = PHASE_HOME;
                     tutorial = true;
                     ready = false;
@@ -553,11 +595,15 @@ void Mode3::HandleEvents() {
                     game_over = false;
                     game_ending = false;
                     ResetGame();
+                    Mix_FadeOutMusic(1000);
                 }
                 //game restart
                 if (mouseX >= destination_rectangle_rb.x && mouseX < destination_rectangle_rb.x + destination_rectangle_rb.w
                     && mouseY >= destination_rectangle_rb.y && mouseY < destination_rectangle_rb.y + destination_rectangle_rb.h
                     && g_current_game_phase == PHASE_MODE3) {
+                    Mix_VolumeChunk(btn_wav, MIX_MAX_VOLUME);
+                    Mix_PlayChannel(-1, btn_wav, 0);
+                    
                     tutorial = true;
                     ready = false;
                     start = false;
@@ -570,6 +616,11 @@ void Mode3::HandleEvents() {
                 if (mouseX >= destination_rectangle_.x && mouseX < destination_rectangle_.x + destination_rectangle_.w
                     && mouseY >= destination_rectangle_.y && mouseY < destination_rectangle_.y + destination_rectangle_.h
                     && g_current_game_phase == PHASE_MODE3 && tutorial == true) {
+                    Mix_VolumeChunk(btn_wav, MIX_MAX_VOLUME);
+                    Mix_PlayChannel(-1, btn_wav, 0);
+                    Mix_VolumeChunk(readySound_wav, MIX_MAX_VOLUME);
+                    Mix_PlayChannel(-1, readySound_wav, 0);
+                    
                     tutorial = false;
                     ready = true;
                     start = false;
@@ -577,7 +628,7 @@ void Mode3::HandleEvents() {
                     game_over = false;
                     game_ending = false;
                     startTime = SDL_GetTicks();
-           
+
                 }
 
             }
@@ -600,7 +651,7 @@ void Mode3::HandleEvents() {
                         lastStonePressTime = SDL_GetTicks();
 
                         velocityY -= monkeySpeed;
-                       
+
                     }
                     else {
                         // 잘못된 숫자를 입력한 경우 게임 오버
@@ -623,7 +674,7 @@ void Mode3::HandleEvents() {
 void Mode3::ResetGame() {
 
     monkeyY = 100;
-    //result 1 = 게임오버/ result 1 = finish
+    //result 1 = 게임오버/ result 2 = finish
     result = 0;
     velocityY = 0;
     correct_button = false;
@@ -633,7 +684,7 @@ void Mode3::ResetGame() {
     monkeyRect.x = 430;
     monkeyRect.y = MONKEY_START_Y;
 
-    
+
 
     currentCharacterIndex = 0;
 
@@ -643,9 +694,9 @@ void Mode3::ResetGame() {
     chRect.y = CH_START_Y;
     chY = 420;
 
-  
 
-    backgroundY = -2400; 	// 배경 이미지 초기 위치 설정 (화면 위로)
+
+    backgroundY = -2400;    // 배경 이미지 초기 위치 설정 (화면 위로)
 
 
 

@@ -3,11 +3,9 @@
 #include "GameIntro.h"
 #include "GameHome.h"
 #include "GameMode1.h"
-#include "GameEnding1.h"
 #include "GameMode2.h"
-#include "GameEnding2.h"
 #include "GameMode3.h"
-#include "GameEnding3.h"
+
 
 
 /////////////////////////////////////////////////
@@ -23,62 +21,57 @@ int g_current_game_phase;
 
 int main(int argc, char* argv[])
 {
-	SDL_Init(SDL_INIT_EVERYTHING);
-	TTF_Init();
+    SDL_Init(SDL_INIT_EVERYTHING);
+    TTF_Init();
 
 
-	g_window = SDL_CreateWindow("First Window", 100, 100, 800, 600, 0);
-	g_renderer = SDL_CreateRenderer(g_window, -1, 0);
+    g_window = SDL_CreateWindow("First Window", 100, 100, 800, 600, 0);
+    g_renderer = SDL_CreateRenderer(g_window, -1, 0);
 
 
-	InitGame();
+    InitGame();
 
-	PhaseInterface* game_phases[8];
-	game_phases[0] = new Intro;
-	game_phases[1] = new Home;
-	game_phases[2] = new Mode1;
-	game_phases[3] = new Mode2;
-	game_phases[4] = new Mode3;
-	game_phases[5] = new Ending1;
-	game_phases[6] = new Ending2;
-	game_phases[7] = new Ending3;
+    PhaseInterface* game_phases[8];
+    game_phases[0] = new Intro;
+    game_phases[1] = new Home;
+    game_phases[2] = new Mode1;
+    game_phases[3] = new Mode2;
+    game_phases[4] = new Mode3;
+ 
 
-	g_current_game_phase = PHASE_INTRO;
+    g_current_game_phase = PHASE_INTRO;
 
-	while (g_flag_running)
-	{
-		Uint32 cur_time_ms = SDL_GetTicks();
+    while (g_flag_running)
+    {
+        Uint32 cur_time_ms = SDL_GetTicks();
 
-		if (cur_time_ms - g_last_time_ms < 33)
-			continue;
+        if (cur_time_ms - g_last_time_ms < 33)
+            continue;
 
-		game_phases[g_current_game_phase]->HandleEvents();
-		game_phases[g_current_game_phase]->Update();
-		game_phases[g_current_game_phase]->Render();
+        game_phases[g_current_game_phase]->HandleEvents();
+        game_phases[g_current_game_phase]->Update();
+        game_phases[g_current_game_phase]->Render();
 
-		g_last_time_ms = cur_time_ms;
+        g_last_time_ms = cur_time_ms;
 
 
-	}
+    }
 
-	delete game_phases[0];
-	delete game_phases[1];
-	delete game_phases[2];
-	delete game_phases[3];
-	delete game_phases[4];
-	delete game_phases[5];
-	delete game_phases[6];
-	delete game_phases[7];
+    delete game_phases[0];
+    delete game_phases[1];
+    delete game_phases[2];
+    delete game_phases[3];
+    delete game_phases[4];
+   
 
 
-	ClearGame();
+    ClearGame();
 
-	SDL_DestroyRenderer(g_renderer);
-	SDL_DestroyWindow(g_window);
+    SDL_DestroyRenderer(g_renderer);
+    SDL_DestroyWindow(g_window);
+    Mix_CloseAudio();
+    TTF_Quit();
+    SDL_Quit();
 
-	Mix_CloseAudio();
-	SDL_Quit();
-
-	return 0;
+    return 0;
 }
-

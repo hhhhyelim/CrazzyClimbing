@@ -22,7 +22,9 @@ private:
 	SDL_Rect source_rectangle_;
 	SDL_Rect destination_rectangle_;
 
-	// btn
+	// btn wav
 	Mix_Chunk* btn_wav;
 
+	// intro bgm
+	Mix_Music* intro_mus;
 };

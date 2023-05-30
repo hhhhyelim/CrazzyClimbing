@@ -16,6 +16,12 @@ int backgroundY; // 배경 이미지의 Y 좌표
 Intro::Intro() {
 
     Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 4096);
+    // intro bgm
+    Mix_Music* intro_mus = Mix_LoadMUS("../../Resources/introBgm.mp3");
+    Mix_VolumeMusic(100); // 배경 음악 소리 볼륨
+
+    Mix_FadeInMusic(intro_mus, -1, 2); // 소리 서서히 커지게
+
     // btn wav
     btn_wav = Mix_LoadWAV("../../Resources/m1/btnSound.wav");
 
@@ -66,6 +72,8 @@ Intro::Intro() {
 Intro::~Intro() {
     SDL_DestroyTexture(g_bg_texture);
     SDL_DestroyTexture(texture_);
+    Mix_FreeMusic(intro_mus);
+    Mix_FreeChunk(btn_wav);
 }
 
 void Intro::Update()

@@ -2,6 +2,7 @@
 
 
 #include <iostream>
+#include <atlstr.h>
 #include <string>
 #include "SDL.h" 
 #include "SDL_ttf.h"
@@ -25,7 +26,6 @@ extern int g_current_game_phase;
 extern bool g_flag_running;
 extern SDL_Renderer* g_renderer;
 extern SDL_Window* g_window;
-
 
 
 class PhaseInterface

@@ -21,9 +21,11 @@ private:
 	Mix_Chunk* btn_sound;
 	Mix_Chunk* mode2_gameover_bgm;
 
+	Mix_Chunk* readySound_wav;
+
 	int cur_i;
 	int prevHold;
-	
+
 	Uint32 startTime = 0;
 	Uint32 gameoverTime = 0;
 
@@ -88,7 +90,7 @@ private:
 	int leftHoldY = 475;
 	int rightHoldY = 375;
 
-	int hold[500]; // 1:red 2:green 3:blue
+	int hold[150]; // 1:red 2:green 3:blue
 	int f_state; // 1:red 2: green 3:blue
 	bool isLeftUser = true;
 	int prevHoldIndex = -1;

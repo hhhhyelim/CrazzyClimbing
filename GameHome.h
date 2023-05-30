@@ -24,6 +24,7 @@ private:
 	SDL_Texture* texture_m1;
 	SDL_Rect source_rectangle_m1;
 	SDL_Rect destination_rectangle_m1;
+	
 
 	// Mode2_Button
 	SDL_Texture* texture_m2;
