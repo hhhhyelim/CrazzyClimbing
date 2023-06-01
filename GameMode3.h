@@ -30,14 +30,14 @@ private:
 	SDL_Rect g_stone_destination_rect;
 	SDL_Texture* stoneTextures[4];
 
-	//Ä³ï¿½ï¿½ï¿½ï¿½
+	//Ä³¸¯ÅÍ
 	SDL_Rect g_ch_source_rect;
 	SDL_Rect g_ch_destination_rect;
 
 
 	//BackGround
 
-  // ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ Å©ï¿½ï¿½
+  // ¹è°æ ÀÌ¹ÌÁö Å©±â
 	const int BACKGROUND_WIDTH = 800;
 	const int BACKGROUND_HEIGHT = 3000;
 	// bg
@@ -45,9 +45,9 @@ private:
 	SDL_Texture* bg_texture;
 	SDL_Rect bg_rect;
 	SDL_Rect bg_dest_rect;
-	int backgroundY; // ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ï¿½ï¿½ Y ï¿½ï¿½Ç¥
+	int backgroundY; // ¹è°æ ÀÌ¹ÌÁöÀÇ Y ÁÂÇ¥
 
-	// ï¿½ï¿½ï¿½ï¿½ Ã¢ Å©ï¿½ï¿½
+	// °ÔÀÓ Ã¢ Å©±â
 	const int WINDOW_WIDTH = 800;
 	const int WINDOW_HEIGHT = 600;
 
@@ -56,7 +56,7 @@ private:
 	SDL_Rect g_w_destination_rect;
 	SDL_Texture* g_w_texture;
 
-	//ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+	//ÀâÀº µ¹
 	SDL_Rect g_caught_source_rect;
 	SDL_Rect g_caught_destination_rect;
 	SDL_Texture* g_caught_texture;
@@ -122,13 +122,13 @@ private:
 	int currentCharacterIndex;
 	bool correct_button;
 
-	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡
+	// ¿ø¼þÀÌ À§Ä¡
 	int MONKEY_START_Y = 150;
-	const int monkeySpeed = 1; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Óµï¿½, Å¬ï¿½ï¿½ï¿½Ì¹ï¿½ ï¿½Óµï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	const int monkeySpeed = 4; // ¿ø¼þÀÌÀÇ ¼Óµµ, Å¬¶óÀÌ¹Ö ¼Óµµ¿¡ µû¶ó Á¶Àý °¡´É
 	int monkeyY = MONKEY_START_Y;
 	int velocityY = 0;
 
-	//Ä³ï¿½ï¿½ï¿½ï¿½
+	//Ä³¸¯ÅÍ
 	//int CH_X = 360;
 	//int CH_WIDTH = 120;
 	//int CH_HEIGHT = 144;
@@ -136,27 +136,27 @@ private:
 	int chY = CH_START_Y;
 
 
-	// ï¿½ï¿½ Å©ï¿½ï¿½
+	// µ¹ Å©±â
 	const int STONE_WIDTH = 64;
 	const int STONE_HEIGHT = 64;
 
-	// ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	// µ¹ ÀÌ¹ÌÁö Ãâ·Â °³¼ö
 	const int NUM_STONES = 5;
 
 
-	// ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½ï¿½Ä¡
-	const int STONE_X = 370; // ï¿½ï¿½ï¿½ï¿½ X ï¿½ï¿½Ç¥
-	const int STONE_Y = 350; // ï¿½ï¿½ï¿½ï¿½ Y ï¿½ï¿½Ç¥
-	const int STONE_SPACING = 110; // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	// µ¹ ÀÌ¹ÌÁö À§Ä¡
+	const int STONE_X = 370; // µ¹ÀÇ X ÁÂÇ¥
+	const int STONE_Y = 350; // µ¹ÀÇ Y ÁÂÇ¥
+	const int STONE_SPACING = 110; // µ¹ »çÀÌÀÇ °£°Ý
 	Uint32 startTime = 0;
 	Uint32 gameoverTime = 0;
 
 
-	std::vector<int> stoneNumbers; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½è¿­
-	int stonesOnScreen; // È­ï¿½é¿¡ ï¿½ï¿½ÂµÇ´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	std::vector<int> stoneNumbers; // ¼ýÀÚ ÀúÀå¿ë ¹è¿­
+	int stonesOnScreen; // È­¸é¿¡ Ãâ·ÂµÇ´Â µ¹ÀÇ °³¼ö
 
 
-	// ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½
+	// ÇÃ·¹ÀÌ¾î°¡ µ¹À» ´©¸¥ ½Ã°£ ±â·Ï
 	Uint32 lastStonePressTime = 0;
 
 
@@ -169,7 +169,7 @@ private:
 	int monkeyFrame = 0;
 	int monkeyTimer = 0;
 
-	// ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+	// ¹è°æ À½¾Ç
 	Mix_Music* bg_mus;
 	// jump wav
 	Mix_Chunk* jump_wav;
@@ -181,7 +181,5 @@ private:
 	Mix_Chunk* gameOver_wav;
 	// ready sound wav
 	Mix_Chunk* readySound_wav;
-	Mix_Chunk* monkey_sound;
-	Mix_Chunk* monkey_fall_sound;
 
 };

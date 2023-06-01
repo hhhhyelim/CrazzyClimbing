@@ -3,16 +3,16 @@
 #include <vector>
 
 
-// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
+// ·£´ý ¼ýÀÚ »ý¼º±â ÃÊ±âÈ­
 std::default_random_engine randomEngine(static_cast<unsigned int>(time(0)));
 std::uniform_int_distribution<int> randomDistribution(1, 4);
 
-// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
-int currentNumber = randomDistribution(randomEngine); // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
+// ÇöÀç µ¹ÀÇ ¼ýÀÚ
+int currentNumber = randomDistribution(randomEngine); // ·£´ý °ªÀ¸·Î ÃÊ±âÈ­
 
 
 Mode3::Mode3() {
-    // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+    // ¹è°æ À½¾Ç
     Mix_OpenAudio(MIX_DEFAULT_FREQUENCY, MIX_DEFAULT_FORMAT, 2, 4096);
     bg_mus = Mix_LoadMUS("../../Resources/m3/mode3Bgm.mp3");
 
@@ -29,12 +29,7 @@ Mode3::Mode3() {
 
     // ready sound wav
     readySound_wav = Mix_LoadWAV("../../Resources/m3/readySound.wav");
-    
-    //monkey sound
-    monkey_sound = Mix_LoadWAV("../../Resources/m3/ ");
-    
-    //monkey fall sound
-    monkey_fall_sound = Mix_LoadWAV("../../Resources/m3/ ");
+
 
     //STATE
     tutorial = true;
@@ -44,13 +39,13 @@ Mode3::Mode3() {
     game_over = false;
     game_ending = false;
 
-    //result 1 = ï¿½ï¿½ï¿½Ó¿ï¿½ï¿½ï¿½/ result 1 = finish
+    //result 1 = °ÔÀÓ¿À¹ö/ result 1 = finish
     result = 0;
 
     correct_button = false;
 
 
-    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½Îµï¿½
+    // ¿ø¼þÀÌ ÀÌ¹ÌÁö ·Îµå
     SDL_Surface* monkeySurface;
     for (int i = 0; i < 3; ++i)
     {
@@ -64,7 +59,7 @@ Mode3::Mode3() {
         SDL_FreeSurface(monkeySurface);
     }
 
-    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
+    // ¿ø¼þÀÌ ÃÊ±â À§Ä¡ ¼³Á¤
     monkeyRect.x = 430;
     monkeyRect.y = MONKEY_START_Y;
     monkeyRect.w = monkeySurface->w;
@@ -73,7 +68,7 @@ Mode3::Mode3() {
     MONKEY_START_Y = 150;
 
     currentCharacterIndex = 0;
-    //Ä³ï¿½ï¿½ï¿½ï¿½
+    //Ä³¸¯ÅÍ
     SDL_Surface* surface;
     {
         for (int i = 0; i < 2; ++i) {
@@ -84,7 +79,7 @@ Mode3::Mode3() {
         }
     }
 
-    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
+    // ¿ø¼þÀÌ ÃÊ±â À§Ä¡ ¼³Á¤
     chRect.x = 360;
     chRect.y = CH_START_Y;
     chRect.w = surface->w;
@@ -94,7 +89,7 @@ Mode3::Mode3() {
 
 
 
-    // ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½È­
+    // µ¹ ¼ýÀÚ ÃÊ±âÈ­
     stoneNumbers.resize(NUM_STONES);
     for (int i = 0; i < NUM_STONES; ++i) {
         stoneNumbers[i] = randomDistribution(randomEngine);
@@ -128,11 +123,11 @@ Mode3::Mode3() {
     }
 
 
-    // ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½Îµï¿½
+    // ¹è°æ ÀÌ¹ÌÁö ·Îµå
     bg_surface = IMG_Load("../../Resources/m3/Mode3_bg_all.png");
-    bg_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface); // GPUï¿½ï¿½ ï¿½Å±ï¿½ï¿½ 
+    bg_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface); // GPU·Î ¿Å±â±â 
     SDL_FreeSurface(bg_surface);
-    backgroundY = -2400;    // ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ (È­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
+    backgroundY = -2400;    // ¹è°æ ÀÌ¹ÌÁö ÃÊ±â À§Ä¡ ¼³Á¤ (È­¸é À§·Î)
 
     //wall
     {
@@ -151,7 +146,7 @@ Mode3::Mode3() {
         g_w_destination_rect.h = 600;
     }
 
-    //caught ï¿½ï¿½
+    //caught µ¹
     {
         SDL_Surface* bg_surface = IMG_Load("../../Resources/m3/caught.png");
         g_caught_texture = SDL_CreateTextureFromSurface(g_renderer, bg_surface);
@@ -186,7 +181,7 @@ Mode3::Mode3() {
     }
 
 
-    // ï¿½Ú·Î°ï¿½ï¿½ï¿½ Button
+    // µÚ·Î°¡±â Button
     {
         SDL_Surface* temp_surface = IMG_Load("../../Resources/m3/Back_Btn_Up.png");
         texture_bb = SDL_CreateTextureFromSurface(g_renderer, temp_surface);
@@ -325,8 +320,6 @@ Mode3::~Mode3() {
     Mix_FreeChunk(gameClear_wav);
     Mix_FreeChunk(gameOver_wav);
     Mix_FreeChunk(readySound_wav);
-    Mix_FreeChunk(monkey_sound);
-    Mix_FreeChunk(monkey_fall_sound);
 
 }
 
@@ -350,8 +343,7 @@ void Mode3::Update()
     }
     else if (start) {
         if (currentTime - startTime >= 1000) {
-            Mix_VolumeChunk(monkey_sound, MIX_MAX_VOLUME);
-            Mix_PlayChannel(-1, monkey_sound, 0);
+
             startTime = currentTime;
 
             tutorial = false;
@@ -367,22 +359,22 @@ void Mode3::Update()
     // game_start
     if (game_start && !game_over) {
 
-        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã¶ï¿½ (ï¿½ß·ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
+        // ¿ø¼þÀÌ °è¼Ó À§·Î ¿Ã¶ó°¨ (Áß·Â À§·Î Àû¿ë)
         monkeyY -= 1;
 
-        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ ï¿½Ìµï¿½ Ã³ï¿½ï¿½
+        // ¿ø¼þÀÌ ¾Ö´Ï¸ÞÀÌ¼Ç ¹× ÀÌµ¿ Ã³¸®
         monkeyTimer++;
-        if (monkeyTimer % 15 == 0) // 1ï¿½Ê¿ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ö´Ï¸ï¿½ï¿½Ì¼ï¿½ ï¿½ï¿½ï¿½ï¿½
+        if (monkeyTimer % 15 == 0) // 1ÃÊ¿¡ ÇÑ ¹ø¾¿ ¾Ö´Ï¸ÞÀÌ¼Ç º¯°æ
         {
-            monkeyFrame = (monkeyFrame + 1) % 2; // monkey1.pngï¿½ï¿½ monkey2.png ï¿½ï¿½ï¿½Ì¿ï¿½ï¿½ï¿½ ï¿½Ýºï¿½
+            monkeyFrame = (monkeyFrame + 1) % 2; // monkey1.png°ú monkey2.png »çÀÌ¿¡¼­ ¹Ýº¹
         }
 
-        // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+        // ¿ø¼þÀÌ ÀâÈú °æ¿ì
         SDL_Rect intersection;
         if (SDL_IntersectRect(&chRect, &monkeyRect, &intersection) == SDL_TRUE && intersection.h >= 60)
         {
             gameoverTime = SDL_GetTicks();
-            monkeyFrame = 2; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ monkey3.pngï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+            monkeyFrame = 2; // ¿ø¼þÀÌ ÀâÈù °æ¿ì monkey3.png·Î º¯°æ
 
             result = 2;
             tutorial = false;
@@ -398,7 +390,7 @@ void Mode3::Update()
     // game_over 
     if (game_over) {
         if (result == 2) {
-            Mix_PlayChannel(-1, monkey_fall_sound, 0);
+            Mix_PlayChannel(-1, gameClear_wav, 0);
             monkeyY += 5;
         }
         else if (result == 1) {
@@ -406,10 +398,10 @@ void Mode3::Update()
             chY += 5;
         }
 
-        // ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ï¿½ï¿½ ï¿½æµ¹ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½
+        // ÇöÀç ½Ã°£°ú Ãæµ¹ °¨Áö ½Ã°£ °£ÀÇ Â÷ÀÌ °è»ê
         Uint32 elapsedTime = currentTime - gameoverTime;
 
-        // 2ï¿½Ê°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¯
+        // 2ÃÊ°¡ °æ°úÇÑ °æ¿ì °ÔÀÓ ¿£µùÀ¸·Î ÀüÈ¯
         if (game_over && elapsedTime >= 1000) {
             tutorial = false;
             ready = false;
@@ -422,7 +414,7 @@ void Mode3::Update()
 
     if (game_start) {
         if (stonesOnScreen == 0) {
-            // È­ï¿½é¿¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Î¿ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½
+            // È­¸é¿¡ µ¹ÀÌ ¾ø´Â °æ¿ì »õ·Î¿î µ¹À» Ãß°¡
             stoneNumbers.push_back(randomDistribution(randomEngine));
             stonesOnScreen = NUM_STONES;
         }
@@ -450,7 +442,7 @@ void Mode3::Update()
 void Mode3::Render() {
     SDL_RenderClear(g_renderer);
 
-    //ï¿½ï¿½ï¿½ï¿½Ì¾ï¿½ï¿½ï¿½ï¿½ï¿½
+    //¹è°æÀÌ¾îÁö±â
     SDL_Rect backgroundRect = { 0, backgroundY, BACKGROUND_WIDTH, BACKGROUND_HEIGHT };
     SDL_RenderCopy(g_renderer, bg_texture, NULL, &backgroundRect);
 
@@ -459,7 +451,7 @@ void Mode3::Render() {
     if (!Mix_PlayingMusic()) {
 
         Mix_PlayMusic(bg_mus, -1);
-        Mix_VolumeMusic(100); // ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ò¸ï¿½ ï¿½ï¿½ï¿½ï¿½
+        Mix_VolumeMusic(100); // ¹è°æ À½¾Ç ¼Ò¸® º¼·ý
     }
 
     // Wall
@@ -495,12 +487,12 @@ void Mode3::Render() {
     }
     else if (game_start || game_over) {
 
-        //ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½
+        //ÀâÀº µ¹
         SDL_RenderCopy(g_renderer, g_caught_texture, &g_caught_source_rect, &g_caught_destination_rect);
 
-        //Ä³ï¿½ï¿½ï¿½ï¿½
+        //Ä³¸¯ÅÍ
         {
-            chRect.y = chY; // Ä³ï¿½ï¿½ï¿½ï¿½ Y ï¿½ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
+            chRect.y = chY; // Ä³¸¯ÅÍ Y ÁÂÇ¥ ¾÷µ¥ÀÌÆ®
             SDL_Rect tmp_r;
             tmp_r.x = chRect.x;
             tmp_r.y = chRect.y;
@@ -509,9 +501,9 @@ void Mode3::Render() {
             SDL_RenderCopy(g_renderer, chTextures[currentCharacterIndex], nullptr, &chRect);
         }
 
-        //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+        //¿ø¼þÀÌ
         {
-            monkeyRect.y = monkeyY; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Y ï¿½ï¿½Ç¥ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Æ®
+            monkeyRect.y = monkeyY; // ¿ø¼þÀÌÀÇ Y ÁÂÇ¥ ¾÷µ¥ÀÌÆ®
             SDL_Rect tmp_r;
             tmp_r.x = monkeyRect.x;
             tmp_r.y = monkeyRect.y;
@@ -520,7 +512,7 @@ void Mode3::Render() {
             SDL_RenderCopy(g_renderer, monkeyTextures[monkeyFrame], nullptr, &tmp_r);
 
         }
-        // ï¿½ï¿½
+        // µ¹
         for (int i = 0; i < NUM_STONES; ++i) {
             int stoneNumber = stoneNumbers[i];
             SDL_Rect stoneRect = { STONE_X, STONE_Y - (STONE_SPACING * i), STONE_WIDTH, STONE_HEIGHT };
@@ -572,7 +564,7 @@ void Mode3::HandleEvents() {
             {
                 int mouseX = event.button.x;
                 int mouseY = event.button.y;
-                //ï¿½Ú·Î°ï¿½ï¿½ï¿½(homeï¿½ï¿½ï¿½ï¿½)
+                //µÚ·Î°¡±â(homeÀ¸·Î)
                 if (mouseX >= destination_rectangle_bb.x && mouseX < destination_rectangle_bb.x + destination_rectangle_bb.w
                     && mouseY >= destination_rectangle_bb.y && mouseY < destination_rectangle_bb.y + destination_rectangle_bb.h
                     && g_current_game_phase == PHASE_MODE3) {
@@ -588,7 +580,7 @@ void Mode3::HandleEvents() {
                     ResetGame();
                     Mix_FadeOutMusic(1000);
                 }
-                //ï¿½Ú·Î°ï¿½ï¿½ï¿½(homeï¿½ï¿½ï¿½ï¿½)
+                //µÚ·Î°¡±â(homeÀ¸·Î)
                 if (mouseX >= destination_rectangle_hb.x && mouseX < destination_rectangle_hb.x + destination_rectangle_hb.w
                     && mouseY >= destination_rectangle_hb.y && mouseY < destination_rectangle_hb.y + destination_rectangle_hb.h
                     && g_current_game_phase == PHASE_MODE3) {
@@ -646,23 +638,23 @@ void Mode3::HandleEvents() {
             int key = event.key.keysym.sym - SDLK_0;
             if (key >= 1 && key <= 4) {
                 if (!ready && !start && game_start) {
-                    // ï¿½Â´ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ Ä³ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+                    // ¸Â´Â µ¹À» ´­·¶À» ¶§ Ä³¸¯ÅÍ ÀÌ¹ÌÁö º¯°æ
                     currentCharacterIndex = (currentCharacterIndex + 1) % 2;
                     if (key == stoneNumbers[0]) {
 
-                        // ï¿½Ã¹Ù¸ï¿½ ï¿½ï¿½ï¿½Ú¸ï¿½ ï¿½Ô·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Æ·ï¿½ï¿½ï¿½ ï¿½Ìµï¿½
+                        // ¿Ã¹Ù¸¥ ¼ýÀÚ¸¦ ÀÔ·ÂÇÑ °æ¿ì µ¹µéÀ» ¾Æ·¡·Î ÀÌµ¿
                         stoneNumbers.erase(stoneNumbers.begin());
                         stoneNumbers.push_back(randomDistribution(randomEngine));
                         correct_button = true;
 
-                        // ï¿½Ã·ï¿½ï¿½Ì¾î°¡ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ã°ï¿½ ï¿½ï¿½ï¿½
+                        // ÇÃ·¹ÀÌ¾î°¡ µ¹À» ´©¸¥ ½Ã°£ ±â·Ï
                         lastStonePressTime = SDL_GetTicks();
 
                         velocityY -= monkeySpeed;
 
                     }
                     else {
-                        // ï¿½ß¸ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ú¸ï¿½ ï¿½Ô·ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+                        // Àß¸øµÈ ¼ýÀÚ¸¦ ÀÔ·ÂÇÑ °æ¿ì °ÔÀÓ ¿À¹ö
                         result = 1;
                         game_over = true;
                         gameoverTime = SDL_GetTicks();
@@ -681,14 +673,13 @@ void Mode3::HandleEvents() {
 
 void Mode3::ResetGame() {
 
-
     monkeyY = 100;
-    //result 1 = ï¿½ï¿½ï¿½Ó¿ï¿½ï¿½ï¿½/ result 2 = finish
+    //result 1 = °ÔÀÓ¿À¹ö/ result 2 = finish
     result = 0;
     velocityY = 0;
     correct_button = false;
 
-    // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
+    // ¿ø¼þÀÌ ÃÊ±â À§Ä¡ ¼³Á¤
     MONKEY_START_Y = 150;
     monkeyRect.x = 430;
     monkeyRect.y = MONKEY_START_Y;
@@ -697,7 +688,7 @@ void Mode3::ResetGame() {
 
     currentCharacterIndex = 0;
 
-    // Ä³ï¿½ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½
+    // Ä³¸¯ÅÍ ÃÊ±â À§Ä¡ ¼³Á¤
     CH_START_Y = 420;
     chRect.x = 360;
     chRect.y = CH_START_Y;
@@ -705,7 +696,7 @@ void Mode3::ResetGame() {
 
 
 
-    backgroundY = -2400;    // ï¿½ï¿½ï¿½ ï¿½Ì¹ï¿½ï¿½ï¿½ ï¿½Ê±ï¿½ ï¿½ï¿½Ä¡ ï¿½ï¿½ï¿½ï¿½ (È­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½)
+    backgroundY = -2400;    // ¹è°æ ÀÌ¹ÌÁö ÃÊ±â À§Ä¡ ¼³Á¤ (È­¸é À§·Î)
 
 
 

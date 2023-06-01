@@ -33,15 +33,6 @@
     <ClCompile Include="GameMode3.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
-    <ClCompile Include="GameEnding1.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="GameEnding2.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="GameEnding3.cpp">
-      <Filter>소스 파일</Filter>
-    </ClCompile>
     <ClCompile Include="main_CrazzyClimbing.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
@@ -63,15 +54,6 @@
       <Filter>소스 파일</Filter>
     </ClInclude>
     <ClInclude Include="GameMode3.h">
-      <Filter>소스 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="GameEnding1.h">
-      <Filter>소스 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="GameEnding2.h">
-      <Filter>소스 파일</Filter>
-    </ClInclude>
-    <ClInclude Include="GameEnding3.h">
       <Filter>소스 파일</Filter>
     </ClInclude>
   </ItemGroup>

@@ -143,9 +143,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
-    <ClCompile Include="GameEnding1.cpp" />
-    <ClCompile Include="GameEnding2.cpp" />
-    <ClCompile Include="GameEnding3.cpp" />
     <ClCompile Include="GameHome.cpp" />
     <ClCompile Include="GameIntro.cpp" />
     <ClCompile Include="GameMode1.cpp" />
@@ -155,9 +152,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Game.h" />
-    <ClInclude Include="GameEnding1.h" />
-    <ClInclude Include="GameEnding2.h" />
-    <ClInclude Include="GameEnding3.h" />
     <ClInclude Include="GameHome.h" />
     <ClInclude Include="GameIntro.h" />
     <ClInclude Include="GameMode1.h" />
